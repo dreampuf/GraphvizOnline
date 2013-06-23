@@ -26,6 +26,14 @@
         left: 50%;
         overflow: scroll;
     }
+    #status {
+        position: fixed;
+        bottom: 0;
+        display: block;
+        color: #FFF;
+        width: 0 auto;
+        z-index: 999;
+    }
   </style>
 </head>
 <body>
@@ -56,7 +64,8 @@
   start [shape=Mdiamond];
   end [shape=Msquare];
 }</pre>
-<div id="review"></div>
+<div id="review" onclick="saveit(this);" title="Click to save it"></div>
+<div id="status"></div>
     
 <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
@@ -64,18 +73,26 @@
     //http://stackoverflow.com/a/10372280/398634
     window.URL = window.URL || window.webkitURL;
     var response = "self.onmessage=function(e){postMessage(Viz(e.data, 'svg'));}";
-    var blob;
-    try {
-        blob = new Blob([response]);
-    } catch (e) { // Backwards-compatibility
-        window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-        blob = new BlobBuilder();
-        blob.append(response);
-        blob = blob.getBlob();
+    var blob, el_stetus = document.getElementById("status"), t_stetus=-1, img = new Image(),
+        alink = document.getElementById("alink"), canvas = document.createElement("canvas");
+    function show_status(text, hide) {
+      hide = hide || 0;
+      clearTimeout(t_stetus);
+      el_stetus.innerHTML = text;
+      if (hide) {
+        t_stetus = setTimeout(function() { el_stetus.innerHTML = ""; }, hide);
+      }
+    }
+    window.saveit = function(el) {
+      window.open(canvas.toDataURL("image/png"));
     }
     var worker = new Worker("viz.js");
     worker.onmessage = function(e) {
-        document.getElementById("review").innerHTML = e.data;
+        show_status("done", 500);
+        if (e.data.type == "svg") {
+          document.getElementById("review").innerHTML = e.data.data;
+          canvg(canvas, e.data.data);
+        }
     };
 
     var editor = ace.edit("editor"), lastHD = -1;
@@ -84,17 +101,20 @@
     editor.getSession().on("change", function(e) {
       clearTimeout(lastHD);
       lastHD = setTimeout(function(){
-        worker.postMessage(editor.getValue());
+        show_status("rendering...");
+        worker.postMessage({"code": editor.getValue(), "type": "svg"});
       }, 1500);
     });
 
     /* Init */
     if (editor.getValue()) {
-      worker.postMessage(editor.getValue());
+      show_status("rendering...");
+      worker.postMessage({"code": editor.getValue(), "type": "svg"});
     }
 })(document);
 </script>
-<script src="viz.js" type="text/javascript" charset="utf-8"></script>
+<script src="viz.js?_t=20130624" type="text/javascript" charset="utf-8"></script>
+<script src="canvg.js?_t=20130624" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>
