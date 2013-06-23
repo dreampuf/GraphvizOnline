@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Graphviz Online</title>
+  <style type="text/css" media="screen">
+    body {
+        overflow: hidden;
+    }
+    
+    #editor {
+        margin: 0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 50%;
+        left: 0;
+    }
+    #review {
+        margin: 0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 50%;
+        overflow: scroll;
+    }
+    #status {
+        position: fixed;
+        bottom: 0;
+        display: block;
+        color: #FFF;
+        width: 0 auto;
+        z-index: 999;
+    }
+  </style>
+</head>
+<body>
+<pre id="editor">digraph G {
+
+  subgraph cluster_0 {
+    style=filled;
+    color=lightgrey;
+    node [style=filled,color=white];
+    a0 -> a1 -> a2 -> a3;
+    label = "process #1";
+  }
+
+  subgraph cluster_1 {
+    node [style=filled];
+    b0 -> b1 -> b2 -> b3;
+    label = "process #2";
+    color=blue
+  }
+  start -> a0;
+  start -> b0;
+  a1 -> b3;
+  b2 -> a3;
+  a3 -> a0;
+  a3 -> end;
+  b3 -> end;
+
+  start [shape=Mdiamond];
+  end [shape=Msquare];
+}</pre>
+<div id="review" onclick="saveit(this);" title="Click to save it"></div>
+<div id="status"></div>
+    
+<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+(function(document){
+    //http://stackoverflow.com/a/10372280/398634
+    window.URL = window.URL || window.webkitURL;
+    var response = "self.onmessage=function(e){postMessage(Viz(e.data, 'svg'));}";
+    var blob, el_stetus = document.getElementById("status"), t_stetus=-1, img = new Image(),
+        alink = document.getElementById("alink"), canvas = document.createElement("canvas");
+    function show_status(text, hide) {
+      hide = hide || 0;
+      clearTimeout(t_stetus);
+      el_stetus.innerHTML = text;
+      if (hide) {
+        t_stetus = setTimeout(function() { el_stetus.innerHTML = ""; }, hide);
+      }
+    }
+    window.saveit = function(el) {
+      window.open(canvas.toDataURL("image/png"));
+    }
+    var worker = new Worker("viz.js");
+    worker.onmessage = function(e) {
+        show_status("done", 500);
+        if (e.data.type == "svg") {
+          document.getElementById("review").innerHTML = e.data.data;
+          canvg(canvas, e.data.data);
+        }
+    };
+
+    var editor = ace.edit("editor"), lastHD = -1;
+    editor.setTheme("ace/theme/twilight");
+    editor.getSession().setMode("ace/mode/dot");
+    editor.getSession().on("change", function(e) {
+      clearTimeout(lastHD);
+      lastHD = setTimeout(function(){
+        show_status("rendering...");
+        worker.postMessage({"code": editor.getValue(), "type": "svg"});
+      }, 1500);
+    });
+
+    /* Init */
+    if (editor.getValue()) {
+      show_status("rendering...");
+      worker.postMessage({"code": editor.getValue(), "type": "svg"});
+    }
+})(document);
+</script>
+<script src="viz.js" type="text/javascript" charset="utf-8"></script>
+<script src="canvg.js" type="text/javascript" charset="utf-8"></script>
+
+</body>
+</html>
