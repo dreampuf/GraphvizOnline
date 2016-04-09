@@ -2,7 +2,7 @@
 
 Author: [dreampuf](https://github.com/dreampuf/)
 
-[GraphvizOnline](https://github.com/dreampuf/GraphvizOnline) could let you debug the graphviz languages online.
+[GraphvizOnline](https://github.com/dreampuf/GraphvizOnline) could let you debug the graphviz languages online. [DEMO](http://dreampuf.github.io/GraphvizOnline/)
 
 # How to implement this
 
