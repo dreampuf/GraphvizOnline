@@ -1318,7 +1318,6 @@ function v(a){void 0!==a?(e.print(a),e.X(a),a=JSON.stringify(a)):a="";w=!0;var b
 })(this);
 
 this.onmessage = function(e){
-  console.log(e);
   postMessage(Viz(e.data));
 }
   
