@@ -167,9 +167,8 @@
 (function(document){
     //http://stackoverflow.com/a/10372280/398634
     window.URL = window.URL || window.webkitURL;
-    var response = "self.onmessage=function(e){postMessage(Viz(e.data, 'svg'));}";
-    var blob, el_stetus = document.getElementById("status"), t_stetus=-1, img = new Image(),
-        alink = document.getElementById("alink"), canvas = document.createElement("canvas");
+    var el_stetus = document.getElementById("status"), t_stetus=-1,
+        reviewer =  document.getElementById("review"), scale = window.devicePixelRatio || 1;
     function show_status(text, hide) {
       hide = hide || 0;
       clearTimeout(t_stetus);
@@ -178,16 +177,48 @@
         t_stetus = setTimeout(function() { el_stetus.innerHTML = ""; }, hide);
       }
     }
+    function svgXmlToImage(svgXml, callback) {
+      var pngImage = new Image(), svgImage = new Image();
+
+      svgImage.onload = function() {
+        var canvas = document.createElement("canvas");
+        canvas.width = svgImage.width * scale;
+        canvas.height = svgImage.height * scale;
+
+        var context = canvas.getContext("2d");
+        context.drawImage(svgImage, 0, 0, canvas.width, canvas.height);
+
+        pngImage.src = canvas.toDataURL("image/png");
+        pngImage.width = svgImage.width;
+        pngImage.height = svgImage.height;
+        
+        if (callback !== undefined) {
+          callback(null, pngImage);
+        }
+      }
+      
+      svgImage.onerror = function(e) {
+        if (callback !== undefined) {
+          callback(e);
+        }
+      }
+      svgImage.src = svgXml;
+    }
     window.saveit = function(el) {
-      window.open(canvas.toDataURL("image/png"));
+      if (el.firstChild) {
+        window.open(el.firstChild.src);
+      }
     }
     var worker = new Worker("viz.js");
     worker.onmessage = function(e) {
-        show_status("done", 500);
-        if (e.data.type == "svg") {
-          document.getElementById("review").innerHTML = e.data.data;
-          canvg(canvas, e.data.data);
-        }
+      show_status("done", 500);
+      svgXmlToImage(e.data.svgXml, function(err, image) {
+      while (reviewer.firstChild) {
+         reviewer.removeChild(reviewer.firstChild);
+      }
+      reviewer.appendChild(image);
+
+      })
     };
 
     var editor = ace.edit("editor"), lastHD = -1;
@@ -197,19 +228,26 @@
       clearTimeout(lastHD);
       lastHD = setTimeout(function(){
         show_status("rendering...");
-        worker.postMessage({"code": editor.getValue(), "type": "svg"});
+        worker.postMessage({ "src": editor.getValue(), "format": "png-image-element"});
+        /*
+        // debug lines
+        var image = Viz({ "src": editor.getValue(), "format": "png-image-element"});
+        while (reviewer.firstChild) {
+           reviewer.removeChild(reviewer.firstChild);
+        }
+        reviewer.appendChild(image);
+        */
       }, 1500);
     });
 
     /* Init */
     if (editor.getValue()) {
       show_status("rendering...");
-      worker.postMessage({"code": editor.getValue(), "type": "svg"});
+      worker.postMessage({ "src": editor.getValue(), "format": "png-image-element"});
     }
 })(document);
 </script>
-<script src="viz.js?_t=20130624" type="text/javascript" charset="utf-8"></script>
-<script src="canvg.js?_t=20130624" type="text/javascript" charset="utf-8"></script>
+<script src="viz.js" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>
