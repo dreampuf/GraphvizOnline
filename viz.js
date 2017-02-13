@@ -1264,7 +1264,7 @@ function v(a){void 0!==a?(e.print(a),e.X(a),a=JSON.stringify(a)):a="";w=!0;var b
       }
     } else {
       return {
-        "svgXml": "data:image/svg+xml;base64," + btoa(svgXml),
+        "svgXml": "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgXml))),
       }
       var svgImage = {};
 
