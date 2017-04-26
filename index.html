@@ -6,123 +6,106 @@
   <title>Graphviz Online</title>
   <style type="text/css" media="screen">
     body {
-        overflow: hidden;
+      overflow: hidden;
+      margin: 0 0;
     }
-    
+
     #editor {
-        margin: 0;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 50%;
-        left: 0;
+      margin: 0;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 50%;
+      left: 0;
     }
+
     #review {
-        margin: 0;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        left: 50%;
-        overflow: scroll;
+      margin: 0;
+      position: absolute;
+      top: 50px;
+      bottom: 0;
+      right: 0;
+      left: 50%;
+      overflow: scroll;
     }
+
+    #options {
+      margin: 0;
+      position: fixed;
+      left: 50%;
+      width: 100%;
+    }
+
+    #options {
+      flex: 0 0 auto;
+      background: #eee;
+      border-bottom: 1px solid #ccc;
+      padding: 8px;
+      overflow: hidden;
+    }
+
+    #options label {
+      margin-right: 8px;
+    }
+
+    #options #raw.disabled {
+      opacity: 0.5;
+    }
+
     #status {
-        position: fixed;
-        bottom: 0;
-        display: block;
-        color: #FFF;
-        width: 0 auto;
-        z-index: 999;
+      width: 100%;
+      position: fixed;
+      bottom: 0;
+      display: block;
+      color: #FFF;
+      z-index: 999;
     }
 
-/* Left will inherit from right (so we don't need to duplicate code */
-.github-fork-ribbon {
-  /* The right and left lasses determine the side we attach our banner to */
-  position: absolute;
+    #review svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
 
-  /* Add a bit of padding to give some substance outside the "stitching" */
-  padding: 2px 0;
+    #review #text {
+      font-size: 12px;
+      font-family: monaco, courier, monospace;
+      white-space: pre;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
 
-  /* Set the base colour */
-  background-color: #a00;
+    #review img {
+      display: block;
+      margin: 0 auto;
+    }
 
-  /* Set a gradient: transparent black at the top to almost-transparent black at the bottom */
-  background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.00)), to(rgba(0, 0, 0, 0.15)));
-  background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
-  background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
-  background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
-  background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
-  background-image: linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#000000', EndColorStr='#000000');
+    #review.working svg, #output.error svg,
+    #review.working #text, #output.error #text,
+    #review.working img, #output.error img {
+      opacity: 0.4;
+    }
 
-  /* Add a drop shadow */
-  -webkit-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.5);
-  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.5);
-}
-.github-fork-ribbon a {
-  /* Set the font */
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: white;
+    #review.error #error {
+      display: inherit;
+    }
 
-  /* Set the text properties */
-  text-decoration: none;
-  text-shadow: 0 -1px rgba(0,0,0,0.5);
-  text-align: center;
-
-  /* Set the geometry. If you fiddle with these you'll also need to tweak the top and right values in #github-fork-ribbon. */
-  width: 200px;
-  line-height: 20px;
-
-  /* Set the layout properties */
-  display: inline-block;
-  padding: 2px 0;
-
-  /* Add "stitching" effect */
-  border-width: 1px 0;
-  border-style: dotted;
-  border-color: rgba(255,255,255,0.7);
-}
-
-.github-fork-ribbon-wrapper {
-  width: 150px;
-  height: 150px;
-  position: absolute;
-  overflow: hidden;
-  top: 0;
-}
-
-.github-fork-ribbon-wrapper.left {
-  left: 0;
-}
-
-.github-fork-ribbon-wrapper.right {
-  right: 0;
-}
-
-.github-fork-ribbon-wrapper.right .github-fork-ribbon {
-  top: 42px;
-  right: -43px;
-
-  /* Rotate the banner 45 degrees */
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-  -o-transform: rotate(45deg);
-  transform: rotate(45deg);
-}
-
-.github-fork-ribbon-wrapper.left .github-fork-ribbon {
-  /* Attach to the left of the page */
-  top: 42px;
-  left: -43px;
-
-  /* Rotate the banner -45 degrees */
-  -webkit-transform: rotate(-45deg);
-  -moz-transform: rotate(-45deg);
-  -o-transform: rotate(-45deg);
-  transform: rotate(-45deg);
-}
+    #review #error {
+      display: none;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      margin-right: 20px;
+      background: red;
+      color: white;
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
@@ -153,7 +136,38 @@
   start [shape=Mdiamond];
   end [shape=Msquare];
 }</pre>
-<div id="review" onclick="saveit(this);" title="Click to save it"></div>
+<div id="options">
+  <label id="engine">
+    Engine:
+    <select>
+      <option>circo</option>
+      <option selected="">dot</option>
+      <option>fdp</option>
+      <option>neato</option>
+      <option>osage</option>
+      <option>twopi</option>
+    </select>
+  </label>
+
+  <label id="format">
+    Format:
+    <select>
+      <option selected="">svg</option>
+      <option>png-image-element</option>
+      <option>json</option>
+      <option>xdot</option>
+      <option>plain</option>
+      <option>ps</option>
+    </select>
+  </label>
+
+  <label id="raw" class="disabled">
+    <input type="checkbox" disabled=""> Show raw output
+  </label>
+</div>
+<div id="review">
+  <div id="error"></div>
+</div>
 <div id="status"></div>
 <div class="github-fork-ribbon-wrapper right">
   <div class="github-fork-ribbon">
@@ -164,23 +178,37 @@
     
 <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
-(function(document){
+  (function (document) {
     //http://stackoverflow.com/a/10372280/398634
     window.URL = window.URL || window.webkitURL;
-    var el_stetus = document.getElementById("status"), t_stetus=-1,
-        reviewer =  document.getElementById("review"), scale = window.devicePixelRatio || 1;
+    var el_stetus = document.getElementById("status"),
+      t_stetus = -1,
+      reviewer = document.getElementById("review"),
+      scale = window.devicePixelRatio || 1,
+      editor = ace.edit("editor"),
+      lastHD = -1,
+      worker = null,
+      parser = new DOMParser(),
+      formatEl = document.querySelector("#format select"),
+      engineEl = document.querySelector("#engine select"),
+      rawEl = document.querySelector("#raw input"),
+      errorEl = document.querySelector("#error");
+
     function show_status(text, hide) {
       hide = hide || 0;
       clearTimeout(t_stetus);
       el_stetus.innerHTML = text;
       if (hide) {
-        t_stetus = setTimeout(function() { el_stetus.innerHTML = ""; }, hide);
+        t_stetus = setTimeout(function () {
+          el_stetus.innerHTML = "";
+        }, hide);
       }
     }
+
     function svgXmlToImage(svgXml, callback) {
       var pngImage = new Image(), svgImage = new Image();
 
-      svgImage.onload = function() {
+      svgImage.onload = function () {
         var canvas = document.createElement("canvas");
         canvas.width = svgImage.width * scale;
         canvas.height = svgImage.height * scale;
@@ -191,61 +219,124 @@
         pngImage.src = canvas.toDataURL("image/png");
         pngImage.width = svgImage.width;
         pngImage.height = svgImage.height;
-        
+
         if (callback !== undefined) {
           callback(null, pngImage);
         }
       }
-      
-      svgImage.onerror = function(e) {
+
+      svgImage.onerror = function (e) {
         if (callback !== undefined) {
           callback(e);
         }
       }
       svgImage.src = svgXml;
     }
-    window.saveit = function(el) {
-      if (el.firstChild) {
-        window.open(el.firstChild.src);
+
+    function renderGraph() {
+      reviewer.classList.add("working");
+      reviewer.classList.remove("error");
+
+      worker = new Worker("viz.js");
+      worker.onmessage = function (e) {
+        show_status("done", 500);
+        reviewer.classList.remove("working");
+        reviewer.classList.remove("error");
+        updateOutput(e.data);
+      };
+      worker.onerror = function (e) {
+        show_status("error", 500);
+        reviewer.classList.remove("working");
+        reviewer.classList.add("error");
+
+        var message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
+
+        while (errorEl.firstChild) {
+          errorEl.removeChild(errorEl.firstChild);
+        }
+
+        errorEl.appendChild(document.createTextNode(message));
+
+        console.error(e);
+        e.preventDefault();
+      }
+
+      show_status("rendering...");
+      var params = {
+        "src": editor.getValue(),
+        "format": formatEl.value,
+        "engine": engineEl.value
+      };
+      worker.postMessage(params);
+    }
+
+    function updateOutput(result) {
+      if (formatEl.value === "svg") {
+        document.querySelector("#raw").classList.remove("disabled");
+        rawEl.disabled = false;
+      } else {
+        document.querySelector("#raw").classList.add("disabled");
+        rawEl.disabled = true;
+      }
+
+      var svg = reviewer.querySelector("svg");
+      if (svg) {
+        reviewer.removeChild(svg);
+      }
+
+      var text = reviewer.querySelector("#text");
+      if (text) {
+        reviewer.removeChild(text);
+      }
+
+      var img = reviewer.querySelector("img");
+      if (img) {
+        reviewer.removeChild(img);
+      }
+
+      if (!result) {
+        return;
+      }
+
+      reviewer.classList.remove("working");
+      reviewer.classList.remove("error");
+
+      if (formatEl.value == "svg" && !rawEl.checked) {
+        var svg = parser.parseFromString(result, "image/svg+xml");
+        reviewer.appendChild(svg.documentElement);
+      } else if (formatEl.value == "png-image-element") {
+        svgXmlToImage(result.svgXml, function (err, image) {
+          image.addEventListener("click", saveit);
+          image.setAttribute("title", "Click to save it");
+          reviewer.appendChild(image);
+        })
+      } else {
+        var text = document.createElement("div");
+        text.id = "text";
+        text.appendChild(document.createTextNode(result));
+        reviewer.appendChild(text);
       }
     }
-    var worker = new Worker("viz.js");
-    worker.onmessage = function(e) {
-      show_status("done", 500);
-      svgXmlToImage(e.data.svgXml, function(err, image) {
-      while (reviewer.firstChild) {
-         reviewer.removeChild(reviewer.firstChild);
-      }
-      reviewer.appendChild(image);
 
-      })
-    };
+    function saveit(e) {
+      window.open(e.target.src);
+    }
 
-    var editor = ace.edit("editor"), lastHD = -1;
     editor.setTheme("ace/theme/twilight");
     editor.getSession().setMode("ace/mode/dot");
-    editor.getSession().on("change", function(e) {
+    editor.getSession().on("change", function () {
       clearTimeout(lastHD);
-      lastHD = setTimeout(function(){
-        show_status("rendering...");
-        worker.postMessage({ "src": editor.getValue(), "format": "png-image-element"});
-        /*
-        // debug lines
-        var image = Viz({ "src": editor.getValue(), "format": "png-image-element"});
-        while (reviewer.firstChild) {
-           reviewer.removeChild(reviewer.firstChild);
-        }
-        reviewer.appendChild(image);
-        */
-      }, 1500);
+      lastHD = setTimeout(renderGraph, 1500);
     });
+    formatEl.addEventListener("change", renderGraph);
+    engineEl.addEventListener("change", renderGraph);
+    rawEl.addEventListener("change", renderGraph);
 
     /* Init */
     if (editor.getValue()) {
-      show_status("rendering...");
-      worker.postMessage({ "src": editor.getValue(), "format": "png-image-element"});
+      renderGraph();
     }
-})(document);
+  })(document);
 </script>
 <script src="viz.js" type="text/javascript" charset="utf-8"></script>
 
