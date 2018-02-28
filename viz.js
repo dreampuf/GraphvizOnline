@@ -1192,11 +1192,21 @@ function v(a){void 0!==a?(e.print(a),e.X(a),a=JSON.stringify(a)):a="";w=!0;var b
     var scale = options.scale;
     var totalMemory = options.totalMemory;
   
-    if (format == "png-image-element") {
-      return Viz.svgXmlToPngImageElement(render(src, "svg", engine, totalMemory), scale);
-    } else {
-      return render(src, format, engine, totalMemory);
+    var ret = {"type": "data"};
+    try {
+      if (format == "png-image-element") {
+        ret["data"] = render(src, "svg", engine, totalMemory);
+        if (!ret["data"].startsWith("ERROR: ")) {
+          ret["data"] = Viz.svgXmlToPngImageElement(ret["data"], scale);
+        }
+      } else {
+        ret["data"] = render(src, format, engine, totalMemory);
+      }
+    } catch (e) {
+      ret["type"] = "error";
+      ret["data"] = e;
     }
+    return ret;
   }
   
   function render(src, format, engine, totalMemory) {
@@ -1207,9 +1217,10 @@ function v(a){void 0!==a?(e.print(a),e.X(a),a=JSON.stringify(a)):a="";w=!0;var b
 
     var errorMessagePointer = graphviz["ccall"]("vizLastErrorMessage", "number", [], []);
     var errorMessageString = graphviz["Pointer_stringify"](errorMessagePointer);
-    
+
+    /* I was plan to serilize with JSON, but it's a little bit overhead for there */
     if (errorMessageString != "") {
-      throw new Error(errorMessageString);
+      return "ERROR: " + errorMessageString;
     }
     
     return resultString;
@@ -1317,7 +1328,8 @@ function v(a){void 0!==a?(e.print(a),e.X(a),a=JSON.stringify(a)):a="";w=!0;var b
 
 })(this);
 
-this.onmessage = function(e){
-  postMessage(Viz(e.data));
-}
+self.addEventListener('message', function(e) {
+  var result = Viz(e.data);
+  postMessage(result.data);
+}, false);
   

@@ -183,6 +183,7 @@
       lastHD = -1,
       worker = null,
       parser = new DOMParser(),
+      showError = null,
       formatEl = document.querySelector("#format select"),
       engineEl = document.querySelector("#engine select"),
       rawEl = document.querySelector("#raw input"),
@@ -197,6 +198,18 @@
           el_stetus.innerHTML = "";
         }, hide);
       }
+    }
+
+    function show_error(e) {
+      show_status("error", 500);
+      reviewer.classList.remove("working");
+      reviewer.classList.add("error");
+
+      var message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
+      while (errorEl.firstChild) {
+        errorEl.removeChild(errorEl.firstChild);
+      }
+      errorEl.appendChild(document.createTextNode(message));
     }
 
     function svgXmlToImage(svgXml, callback) {
@@ -232,28 +245,18 @@
       reviewer.classList.remove("error");
 
       worker = new Worker("viz.js");
-      worker.onmessage = function (e) {
+      worker.addEventListener("message", function (e) {
+        if(typeof e.data === "string" && e.data.startsWith("ERROR: ")) {
+          var event = new CustomEvent("error", {"detail": new Error(e.data.substring(7))});
+          worker.dispatchEvent(event);
+          return
+        }
         show_status("done", 500);
         reviewer.classList.remove("working");
         reviewer.classList.remove("error");
         updateOutput(e.data);
-      };
-      worker.onerror = function (e) {
-        show_status("error", 500);
-        reviewer.classList.remove("working");
-        reviewer.classList.add("error");
-
-        var message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
-
-        while (errorEl.firstChild) {
-          errorEl.removeChild(errorEl.firstChild);
-        }
-
-        errorEl.appendChild(document.createTextNode(message));
-
-        console.error(e);
-        e.preventDefault();
-      }
+      }, false);
+      worker.addEventListener('error', function(e) { show_error(e.detail); }, false);
 
       show_status("rendering...");
       var params = {
@@ -300,6 +303,10 @@
         reviewer.appendChild(svg.documentElement);
       } else if (formatEl.value == "png-image-element") {
         svgXmlToImage(result.svgXml, function (err, image) {
+          if (err) {
+            show_error(err)
+            return
+          }
           image.addEventListener("click", saveit);
           image.setAttribute("title", "Click to save it");
           reviewer.appendChild(image);
