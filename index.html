@@ -1,112 +1,117 @@
 <!DOCTYPE html>
 <html lang="utf-8">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Graphviz Online</title>
-  <style type="text/css" media="screen">
-    body {
-      overflow: hidden;
-      margin: 0 0;
-    }
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Graphviz Online</title>
+    <style type="text/css" media="screen">
+        body {
+            overflow: hidden;
+            margin: 0 0;
+        }
 
-    #editor {
-      margin: 0;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 50%;
-      left: 0;
-    }
+        #editor {
+            margin: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 50%;
+            left: 0;
+        }
 
-    #review {
-      margin: 0;
-      position: absolute;
-      top: 50px;
-      bottom: 0;
-      right: 0;
-      left: 50%;
-      overflow: scroll;
-    }
+        #review {
+            margin: 0;
+            position: absolute;
+            top: 50px;
+            bottom: 0;
+            right: 0;
+            left: 50%;
+            overflow: scroll;
+        }
 
-    #options {
-      margin: 0;
-      position: fixed;
-      left: 50%;
-      width: 100%;
-    }
+        #options {
+            margin: 0;
+            position: fixed;
+            left: 50%;
+            width: 100%;
+        }
 
-    #options {
-      flex: 0 0 auto;
-      background: #eee;
-      border-bottom: 1px solid #ccc;
-      padding: 8px;
-      overflow: hidden;
-    }
+        #options {
+            flex: 0 0 auto;
+            background: #eee;
+            border-bottom: 1px solid #ccc;
+            padding: 8px;
+            overflow: hidden;
+        }
 
-    #options label {
-      margin-right: 8px;
-    }
+        #options label {
+            margin-right: 8px;
+        }
 
-    #options #raw.disabled {
-      opacity: 0.5;
-    }
+        #options #raw.disabled {
+            opacity: 0.5;
+        }
 
-    #status {
-      width: 100%;
-      position: fixed;
-      bottom: 0;
-      display: block;
-      color: #FFF;
-      z-index: 999;
-    }
+        #shareurl {
+            display: none;
+        }
 
-    #review svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
+        #status {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            display: block;
+            color: #FFF;
+            z-index: 999;
+        }
 
-    #review #text {
-      font-size: 12px;
-      font-family: monaco, courier, monospace;
-      white-space: pre;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-    }
+        #review svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
 
-    #review img {
-      display: block;
-      margin: 0 auto;
-    }
+        #review #text {
+            font-size: 12px;
+            font-family: monaco, courier, monospace;
+            white-space: pre;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
 
-    #review.working svg, #output.error svg,
-    #review.working #text, #output.error #text,
-    #review.working img, #output.error img {
-      opacity: 0.4;
-    }
+        #review img {
+            display: block;
+            margin: 0 auto;
+        }
 
-    #review.error #error {
-      display: inherit;
-    }
+        #review.working svg, #output.error svg,
+        #review.working #text, #output.error #text,
+        #review.working img, #output.error img {
+            opacity: 0.4;
+        }
 
-    #review #error {
-      display: none;
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      margin-right: 20px;
-      background: red;
-      color: white;
-      z-index: 1;
-    }
-  </style>
+        #review.error #error {
+            display: inherit;
+        }
+
+        #review #error {
+            display: none;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            margin-right: 20px;
+            background: red;
+            color: white;
+            z-index: 1;
+        }
+
+    </style>
 </head>
 <body>
 <pre id="editor">digraph G {
@@ -137,42 +142,49 @@
   end [shape=Msquare];
 }</pre>
 <div id="options">
-  <label id="engine">
-    Engine:
-    <select>
-      <option>circo</option>
-      <option selected="">dot</option>
-      <option>fdp</option>
-      <option>neato</option>
-      <option>osage</option>
-      <option>twopi</option>
-    </select>
-  </label>
+    <label id="engine">
+        Engine:
+        <select>
+            <option>circo</option>
+            <option selected="">dot</option>
+            <option>fdp</option>
+            <option>neato</option>
+            <option>osage</option>
+            <option>twopi</option>
+        </select>
+    </label>
 
-  <label id="format">
-    Format:
-    <select>
-      <option selected="">svg</option>
-      <option>png-image-element</option>
-      <option>json</option>
-      <option>xdot</option>
-      <option>plain</option>
-      <option>ps</option>
-    </select>
-  </label>
+    <label id="format">
+        Format:
+        <select>
+            <option selected="">svg</option>
+            <option>png-image-element</option>
+            <option>json</option>
+            <option>xdot</option>
+            <option>plain</option>
+            <option>ps</option>
+        </select>
+    </label>
 
-  <label id="raw" class="disabled">
-    <input type="checkbox" disabled=""> Show raw output
-  </label>
+    <label id="raw" class="disabled">
+        <input type="checkbox" disabled=""> Show raw output
+    </label>
+
+    <label>
+        <input type="button" value="Share URL" id="share">
+    </label>
+
+    <input type="input" value="" id="shareurl">
+
 </div>
 <div id="review">
-  <div id="error"></div>
+    <div id="error"></div>
 </div>
 <div id="status"></div>
 <div class="github-fork-ribbon-wrapper right">
-  <div class="github-fork-ribbon">
-    <a href="https://github.com/dreampuf/GraphvizOnline">Fork me on GitHub</a>
-  </div>
+    <div class="github-fork-ribbon">
+        <a href="https://github.com/dreampuf/graphvizonline">Fork me on GitHub</a>
+    </div>
 </div>
 
 <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
@@ -192,6 +204,8 @@
       formatEl = document.querySelector("#format select"),
       engineEl = document.querySelector("#engine select"),
       rawEl = document.querySelector("#raw input"),
+      shareEl = document.querySelector("#share"),
+      shareURLEl = document.querySelector("#shareurl"),
       errorEl = document.querySelector("#error");
 
     function show_status(text, hide) {
@@ -245,29 +259,78 @@
       svgImage.src = svgXml;
     }
 
+    function copyShareURL(e) {
+      var content = encodeURIComponent(editor.getSession().getDocument().getValue());
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://git.io/create", true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.send("url=https://dreampuf.github.io/GraphvizOnline/#" + content);
+      xhr.onreadystatechange = function () {
+        if (this.readyState != 4) return;
+
+        shareURLEl.style.display = "inline";
+        if (this.status == 200) {
+          shareURLEl.value = "https://git.io/" + this.responseText
+        } else {
+          shareURLEl.value = "https://dreampuf.github.io/GraphvizOnline/#" + content
+        }
+      };
+    }
+
+    function copyToClipboard(str) {
+      const el = document.createElement('textarea');
+      el.value = str;
+      el.setAttribute('readonly', '');
+      el.style.position = 'absolute';
+      el.style.left = '-9999px';
+      document.body.appendChild(el);
+      const selected =
+        document.getSelection().rangeCount > 0
+          ? document.getSelection().getRangeAt(0)
+          : false;
+      el.select();
+      var result = document.execCommand('copy')
+      document.body.removeChild(el);
+      if (selected) {
+        document.getSelection().removeAllRanges();
+        document.getSelection().addRange(selected);
+      }
+      return result;
+    };
+
     function renderGraph() {
       reviewer.classList.add("working");
       reviewer.classList.remove("error");
 
-      worker = new Worker("viz.js");
+      if (worker) {
+        worker.terminate();
+      }
+
+      worker = new Worker("full.render.js");
       worker.addEventListener("message", function (e) {
-        if(typeof e.data === "string" && e.data.startsWith("ERROR: ")) {
-          var event = new CustomEvent("error", {"detail": new Error(e.data.substring(7))});
+        if (typeof e.data.error !== "undefined") {
+          var event = new CustomEvent("error", {"detail": new Error(e.data.error.message)});
           worker.dispatchEvent(event);
           return
         }
         show_status("done", 500);
         reviewer.classList.remove("working");
         reviewer.classList.remove("error");
-        updateOutput(e.data);
+        updateOutput(e.data.result);
       }, false);
-      worker.addEventListener('error', function(e) { show_error(e.detail); }, false);
+      worker.addEventListener('error', function (e) {
+        show_error(e.detail);
+      }, false);
 
       show_status("rendering...");
       var params = {
-        "src": editor.getValue(),
-        "format": formatEl.value,
-        "engine": engineEl.value
+        "src": editor.getSession().getDocument().getValue(),
+        "id": new Date().toJSON(),
+        "options": {
+          "files": [],
+          "format": formatEl.value === "png-image-element" ? "svg" : formatEl.value,
+          "engine": engineEl.value
+        },
       };
       worker.postMessage(params);
     }
@@ -291,9 +354,9 @@
         reviewer.removeChild(text);
       }
 
-      var img = reviewer.querySelector("img");
-      if (img) {
-        reviewer.removeChild(img);
+      var a = reviewer.querySelector("a");
+      if (a) {
+        reviewer.removeChild(a);
       }
 
       if (!result) {
@@ -307,14 +370,19 @@
         var svg = parser.parseFromString(result, "image/svg+xml");
         reviewer.appendChild(svg.documentElement);
       } else if (formatEl.value == "png-image-element") {
-        svgXmlToImage(result.svgXml, function (err, image) {
+        var resultWithPNGHeader = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(result)));
+        svgXmlToImage(resultWithPNGHeader, function (err, image) {
           if (err) {
             show_error(err)
             return
           }
-          image.addEventListener("click", saveit);
           image.setAttribute("title", "Click to save it");
-          reviewer.appendChild(image);
+          var a = document.createElement("a");
+          a.href = image.src;
+          a.target = "_blank";
+          a.download = "graphviz.png";
+          a.appendChild(image);
+          reviewer.appendChild(a);
         })
       } else {
         var text = document.createElement("div");
@@ -322,10 +390,6 @@
         text.appendChild(document.createTextNode(result));
         reviewer.appendChild(text);
       }
-    }
-
-    function saveit(e) {
-      window.open(e.target.src);
     }
 
     editor.setTheme("ace/theme/twilight");
@@ -337,6 +401,13 @@
     formatEl.addEventListener("change", renderGraph);
     engineEl.addEventListener("change", renderGraph);
     rawEl.addEventListener("change", renderGraph);
+    share.addEventListener("click", copyShareURL);
+
+
+    /* come from sharing */
+    if (location.hash.length > 1) {
+      editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
+    }
 
     /* Init */
     if (editor.getValue()) {
@@ -345,6 +416,5 @@
   })(document);
 </script>
 <script src="viz.js" type="text/javascript" charset="utf-8"></script>
-
 </body>
 </html>
