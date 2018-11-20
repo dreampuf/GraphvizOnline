@@ -261,8 +261,7 @@
 
     function copyShareURL(e) {
       var content = encodeURIComponent(editor.getSession().getDocument().getValue());
-      location.href = "#" + content;
-
+      
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "https://api-ssl.bitly.com/v4/shorten", true);
       xhr.setRequestHeader('Content-Type', 'application/json');
@@ -395,6 +394,11 @@
         text.appendChild(document.createTextNode(result));
         reviewer.appendChild(text);
       }
+
+
+      // update href
+      var content = encodeURIComponent(editor.getSession().getDocument().getValue());
+      location.hash = "#" + content;
     }
 
     editor.setTheme("ace/theme/twilight");
@@ -403,6 +407,11 @@
       clearTimeout(lastHD);
       lastHD = setTimeout(renderGraph, 1500);
     });
+
+    window.onpopstate = function(event) {
+      editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
+    };
+
     formatEl.addEventListener("change", renderGraph);
     engineEl.addEventListener("change", renderGraph);
     rawEl.addEventListener("change", renderGraph);
