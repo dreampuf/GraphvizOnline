@@ -171,7 +171,7 @@
     </label>
 
     <label>
-        <input type="button" value="Share URL" id="share">
+        <input type="button" value="Share" id="share">
     </label>
 
     <input type="input" value="" id="shareurl">
@@ -261,16 +261,21 @@
 
     function copyShareURL(e) {
       var content = encodeURIComponent(editor.getSession().getDocument().getValue());
+      location.href = "#" + content;
+
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", "https://git.io/create", true);
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      xhr.send("url=https://dreampuf.github.io/GraphvizOnline/#" + content);
+      xhr.open("POST", "https://api-ssl.bitly.com/v4/shorten", true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      /* love and peace; don't let me down :) */
+      xhr.setRequestHeader('Authorization', 'Bearer 5959ae0ffc42f5e6b8cee4ebf1b7ee0218bfc291');
+      xhr.send(JSON.stringify({ "long_url": "https://dreampuf.github.io/GraphvizOnline/#" + content}));
       xhr.onreadystatechange = function () {
         if (this.readyState != 4) return;
 
         shareURLEl.style.display = "inline";
-        if (this.status == 200) {
-          shareURLEl.value = "https://git.io/" + this.responseText
+        if (this.status >= 200 && this.status < 300 && this.responseText.indexOf('"link":') >= 0) {
+          var result = JSON.parse(this.responseText);
+          shareURLEl.value = result.link;
         } else {
           shareURLEl.value = "https://dreampuf.github.io/GraphvizOnline/#" + content
         }
