@@ -339,6 +339,11 @@
       worker.postMessage(params);
     }
 
+    function updateState() {
+      var content = encodeURIComponent(editor.getSession().getDocument().getValue());
+      history.pushState({"content": content}, "", "#" + content)
+    }
+
     function updateOutput(result) {
       if (formatEl.value === "svg") {
         document.querySelector("#raw").classList.remove("disabled");
@@ -395,10 +400,7 @@
         reviewer.appendChild(text);
       }
 
-
-      // update href
-      var content = encodeURIComponent(editor.getSession().getDocument().getValue());
-      location.hash = "#" + content;
+      updateState()
     }
 
     editor.setTheme("ace/theme/twilight");
@@ -409,8 +411,8 @@
     });
 
     window.onpopstate = function(event) {
-      if (location.hash.length > 1) {
-        editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
+      if (event.state != null && event.state.content != undefined) {
+        editor.getSession().setValue(decodeURIComponent(event.state.content));
       }
     };
 
