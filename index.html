@@ -261,7 +261,7 @@
 
     function copyShareURL(e) {
       var content = encodeURIComponent(editor.getSession().getDocument().getValue());
-      
+
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "https://api-ssl.bitly.com/v4/shorten", true);
       xhr.setRequestHeader('Content-Type', 'application/json');
@@ -419,8 +419,9 @@
 
 
     /* come from sharing */
-    if (location.hash.length > 1) {
-      editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
+    if (location.hash.length > 1 && location.hash.length > 1) {
+      var content = decodeURIComponent(location.hash.substring(1));
+      editor.getSession().setValue(content);
     }
 
     /* Init */
