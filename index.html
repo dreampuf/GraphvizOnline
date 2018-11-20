@@ -409,7 +409,9 @@
     });
 
     window.onpopstate = function(event) {
-      editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
+      if (location.hash.length > 1) {
+        editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
+      }
     };
 
     formatEl.addEventListener("change", renderGraph);
@@ -419,9 +421,8 @@
 
 
     /* come from sharing */
-    if (location.hash.length > 1 && location.hash.length > 1) {
-      var content = decodeURIComponent(location.hash.substring(1));
-      editor.getSession().setValue(content);
+    if (location.hash.length > 1) {
+      editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
     }
 
     /* Init */
