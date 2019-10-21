@@ -383,7 +383,7 @@
             source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
         }
         //add xml declaration
-        if !source.startsWith("<?xml version") {
+        if (!source.startsWith("<?xml version")) {
             source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
         }
         // https://stackoverflow.com/questions/18925210/download-blob-content-using-specified-charset
