@@ -383,7 +383,9 @@
             source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
         }
         //add xml declaration
-        source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+        if !source.startsWith("<?xml version") {
+            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+        }
         // https://stackoverflow.com/questions/18925210/download-blob-content-using-specified-charset
         //const blob = new Blob(["\ufeff", svg], {type: 'image/svg+xml;charset=utf-8'});
         const url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
