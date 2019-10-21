@@ -377,7 +377,14 @@
 
       if (formatEl.value == "svg" && !rawEl.checked) {
         var svg = parser.parseFromString(result, "image/svg+xml");
-        reviewer.appendChild(svg.documentElement);
+        const blob = new Blob([svg], {type: 'image/svg+xml'});
+        const url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.target = "_blank";
+        a.download = "graphviz.svg";
+        a.appendChild(svg.documentElement);
+        reviewer.appendChild(a);
       } else if (formatEl.value == "png-image-element") {
         var resultWithPNGHeader = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(result)));
         svgXmlToImage(resultWithPNGHeader, function (err, image) {
