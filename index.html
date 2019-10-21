@@ -377,7 +377,20 @@
 
       if (formatEl.value == "svg" && !rawEl.checked) {
         var svg = parser.parseFromString(result, "image/svg+xml");
-        const blob = new Blob([svg], {type: 'image/svg+xml'});
+        //get svg source.
+        var serializer = new XMLSerializer();
+        var source = serializer.serializeToString(svg);
+        //add name spaces.
+        if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+            source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+        if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+            source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+        }
+        //add xml declaration
+        source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+        // https://stackoverflow.com/questions/18925210/download-blob-content-using-specified-charset
+        const blob = new Blob(["\ufeff", svg], {type: 'image/svg+xml;charset=utf-8'});
         const url = URL.createObjectURL(blob);
         var a = document.createElement("a");
         a.href = url;
