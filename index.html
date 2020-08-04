@@ -440,9 +440,7 @@
 
 		// Since apparently HTMLCollection does not implement the oh so convenient array functions
 		HTMLOptionsCollection.prototype.indexOf = function(name) {
-			console.log(name, this.length);
 			for (let i = 0; i < this.length; i++) {
-				console.log(this[i].value);
 				if (this[i].value == name) {
 					return i;
 				}
@@ -455,7 +453,6 @@
 		const params = new URLSearchParams(location.search.substring(1));
 		if (params.has('engine')) {
 			const engine = params.get('engine');
-			console.log(typeof engineEl.options);
 			const index = engineEl.options.indexOf(engine);
 			if (index > -1) { // if index exists
 				engineEl.selectedIndex = index;
