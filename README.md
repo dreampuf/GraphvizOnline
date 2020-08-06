@@ -2,7 +2,15 @@
 
 Author: [dreampuf](https://github.com/dreampuf/)
 
-[GraphvizOnline](https://github.com/dreampuf/GraphvizOnline) could let you debug the graphviz languages online. [DEMO](http://dreampuf.github.io/GraphvizOnline/)
+[GraphvizOnline](https://github.com/dreampuf/GraphvizOnline) lets you edit and view [GraphViz](http://www.graphviz.org/) diagrams online. You can [use GraphvizOnline online here](http://dreampuf.github.io/GraphvizOnline/).
+
+## Graph from URL / Gist
+
+You can display a graph defined in a gist, or any other publically available url by adding a `?url=` parameter to the GraphvizOnline url
+
+Example: https://dreampuf.github.io/GraphvizOnline/?url=https://gist.githubusercontent.com/timabell/da08616ecb8693d524b8eab3b7b51018/raw/0e205c341b40641206a55c9f96b5db9b8fa581bc/graph.gv
+
+Using https://gist.github.com/ allows you to share and version your graph definitions.
 
 # How to implement this
 
