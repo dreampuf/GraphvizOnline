@@ -438,9 +438,29 @@
     rawEl.addEventListener("change", renderGraph);
     share.addEventListener("click", copyShareURL);
 
+		// Since apparently HTMLCollection does not implement the oh so convenient array functions
+		HTMLOptionsCollection.prototype.indexOf = function(name) {
+			for (let i = 0; i < this.length; i++) {
+				if (this[i].value == name) {
+					return i;
+				}
+			}
+			
+			return -1;
+		};
 
     /* come from sharing */
 		const params = new URLSearchParams(location.search.substring(1));
+		if (params.has('engine')) {
+			const engine = params.get('engine');
+			const index = engineEl.options.indexOf(engine);
+			if (index > -1) { // if index exists
+				engineEl.selectedIndex = index;
+			} else {
+				show_error({ message: `invalid engine ${engine} selected` });
+			}
+		}
+
 		if (params.has('raw')) {
 			editor.getSession().setValue(params.get('raw'));
       renderGraph();
