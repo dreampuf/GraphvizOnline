@@ -186,7 +186,8 @@
         <a href="https://github.com/dreampuf/graphvizonline">Fork me on GitHub</a>
     </div>
 </div>
-
+<!-- use script tag in case page is loaded from local disk, see https://stackoverflow.com/questions/21408510/chrome-cant-load-web-worker-->
+<script src="full.render.js" type="text/javascript" charset="utf-8"></script>
 <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
   (function (document) {
@@ -310,7 +311,9 @@
         worker.terminate();
       }
 
-      worker = new Worker("full.render.js");
+      //worker = new Worker("full.render.js");
+	  //Workaround for loading page on local disk from https://stackoverflow.com/questions/21408510/chrome-cant-load-web-worker
+	  worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})))
       worker.addEventListener("message", function (e) {
         if (typeof e.data.error !== "undefined") {
           var event = new CustomEvent("error", {"detail": new Error(e.data.error.message)});

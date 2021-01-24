@@ -1,3 +1,6 @@
+//Workaround for loading page on local disk from https://stackoverflow.com/questions/21408510/chrome-cant-load-web-worker
+function worker_function() {
+
 /*
 Viz.js 2.1.1 (Graphviz 2.40.1, Expat 2.2.5, Emscripten 1.37.36)
 */
@@ -85,3 +88,12 @@ if (typeof global.Viz !== 'undefined') {
 }
 
 })(typeof self !== 'undefined' ? self : this);
+    
+}
+// This is in case of normal worker start
+// "window" is not defined in web worker
+// so if you load this file directly using `new Worker`
+// the worker code will still execute properly
+//see: Workaround for loading page on local disk from https://stackoverflow.com/questions/21408510/chrome-cant-load-web-worker
+if(window!=self)
+  worker_function();
