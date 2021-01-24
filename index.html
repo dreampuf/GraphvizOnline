@@ -190,6 +190,9 @@
 <script src="full.render.js" type="text/javascript" charset="utf-8"></script>
 <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
+	//add shortkey to toggle comments with german keyboard layout/language settings
+	ace.edit("editor").commands.bindKey("ctrl-shift-7", "togglecomment");
+	
   (function (document) {
     //http://stackoverflow.com/a/10372280/398634
     window.URL = window.URL || window.webkitURL;
