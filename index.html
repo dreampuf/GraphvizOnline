@@ -111,6 +111,18 @@
             z-index: 1;
         }
 
+        #download {
+            font: bold 12px Arial;
+            text-decoration: none;
+            background-color: #EEEEEE;
+            color: #333333;
+            padding: 2px 6px 2px 6px;
+            border-top: 1px solid #CCCCCC;
+            border-right: 1px solid #333333;
+            border-bottom: 1px solid #333333;
+            border-left: 1px solid #CCCCCC;
+        }
+
     </style>
 </head>
 <body>
@@ -171,6 +183,10 @@
     </label>
 
     <label>
+      <a href="#" target="_blank" id="download">Download</a>
+    </label>
+
+    <label>
         <input type="button" value="Share" id="share">
     </label>
 
@@ -196,6 +212,7 @@
       t_stetus = -1,
       reviewer = document.getElementById("review"),
       scale = window.devicePixelRatio || 1,
+      downloadBtn = document.getElementById("download"),
       editor = ace.edit("editor"),
       lastHD = -1,
       worker = null,
@@ -389,12 +406,18 @@
         // https://stackoverflow.com/questions/18925210/download-blob-content-using-specified-charset
         //const blob = new Blob(["\ufeff", svg], {type: 'image/svg+xml;charset=utf-8'});
         const url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
+        downloadBtn.href = url;
+        downloadBtn.download = "graphviz.svg";
         var a = document.createElement("a");
-        a.href = url;
-        a.target = "_blank";
-        a.download = "graphviz.svg";
-        a.appendChild(svg.documentElement);
+        var svgEl = svg.documentElement;
+        a.appendChild(svgEl);
         reviewer.appendChild(a);
+        svgPanZoom(svgEl, {
+          zoomEnabled: true,
+          controlIconsEnabled: true,
+          fit: true,
+          center: true,
+        });
       } else if (formatEl.value == "png-image-element") {
         var resultWithPNGHeader = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(result)));
         svgXmlToImage(resultWithPNGHeader, function (err, image) {
@@ -402,11 +425,10 @@
             show_error(err)
             return
           }
-          image.setAttribute("title", "Click to save it");
+          image.setAttribute("title", "graphviz");
+          downloadBtn.href = image.src;
+          downloadBtn.download = "graphviz.png";
           var a = document.createElement("a");
-          a.href = image.src;
-          a.target = "_blank";
-          a.download = "graphviz.png";
           a.appendChild(image);
           reviewer.appendChild(a);
         })
@@ -493,5 +515,6 @@
   })(document);
 </script>
 <script src="viz.js" type="text/javascript" charset="utf-8"></script>
+<script src="svg-pan-zoom.min.js" type="text/javascript" charset="utf-8"></script>
 </body>
 </html>
