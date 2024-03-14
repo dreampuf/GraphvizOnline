@@ -305,6 +305,7 @@
           const compressedContent = LZString.compressToEncodedURIComponent(editor.getSession().getDocument().getValue());
           const compressedUrl = new URL(location.href);
           compressedUrl.searchParams.append("compressed", compressedContent);
+          compressedUrl.hash = "";
 
           shareURLEl.value = compressedUrl.toString();
         }
