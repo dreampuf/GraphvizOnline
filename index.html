@@ -302,9 +302,7 @@
           var result = JSON.parse(this.responseText);
           shareURLEl.value = result.link;
         } else {
-          shareURLEl.value = longUrl.toString();
-
-          const compressedContent = LZString.compressToEncodedURIComponent(content);
+          const compressedContent = LZString.compressToEncodedURIComponent(editor.getSession().getDocument().getValue());
           const compressedUrl = new URL(location.href);
           compressedUrl.searchParams.append("compressed", compressedContent);
 
