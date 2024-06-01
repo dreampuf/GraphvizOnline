@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa conceptual - Texto</title>
+    <script src="https://github.com/dreampuf/GraphvizOnline"></script>
+</head>
+<body>
+    <h1>Mapa conceptual: Texto</h1>
+    <div id="graphviz"></div>
+
+    <script>
+        var dot = digraph('G');
+
+        // Configurar los nodos y clusters
+        dot.attr('node', shape='box', style='filled', color='lightgrey');
+
+        with dot.subgraph(name='cluster_0') as c:
+            c.attr(label='Qué es un texto', style='filled', color='lightblue');
+            c.node('texto', 'Texto');
+            c.node('definicion', 'Es\nuna\nunidad\nde\ncomunicación');
+            c.node('funcion', 'Tiene\nla\nfunción\nde\ntransmitir\ninformación');
+            c.edge('texto', 'definicion', 'que');
+            c.edge('texto', 'funcion', 'y');
+
+        with dot.subgraph(name='cluster_1') as c:
+            c.attr(label='Características', style='filled', color='lightgreen');
+            c.node('cohesion', 'Cohesión');
+            c.node('coherencia', 'Coherencia');
+            c.node('adecuación', 'Adecuación');
+            c.node('corrección', 'Corrección');
+            c.edge('texto', 'cohesion', 'tiene');
+            c.edge('texto', 'coherencia', 'tiene');
+            c.edge('texto', 'adecuación', 'tiene');
+            c.edge('texto', 'corrección', 'tiene');
+
+        with dot.subgraph(name='cluster_2') as c:
+            c.attr(label='Tipos de texto', style='filled', color='lightcoral');
+            c.node('narrativo', 'Narrativo');
+            c.node('descriptivo', 'Descriptivo');
+            c.node('argumentativo', 'Argumentativo');
+            c.node('expositivo', 'Expositivo');
+            c.edge('texto', 'narrativo', 'puede ser');
+            c.edge('texto', 'descriptivo', 'puede ser');
+            c.edge('texto', 'argumentativo', 'puede ser');
+            c.edge('texto', 'expositivo', 'puede ser');
+
+        // Rango de nodos al mismo nivel
+        dot.attr(rankdir='LR');
+        dot.attr('node', rank='same');
+        dot.edge('definicion', 'funcion', style='invis');
+        dot.edge('cohesion', 'coherencia', style='invis');
+        dot.edge('coherencia', 'adecuación', style='invis');
+        dot.edge('adecuación', 'corrección', style='invis');
+        dot.edge('narrativo', 'descriptivo', style='invis');
+        dot.edge('descriptivo', 'argumentativo', style='invis');
+        dot.edge('argumentativo', 'expositivo', style='invis');
+
+        var viz = new Viz({
+            format: 'png',
+            engine: 'dot'
+        });
+
+        viz.render(dot, function(svg) {
+            var div = document.getElementById('graphviz');
+            div.innerHTML = svg;
+        });
+    </script>
+</body>
+</html>
