@@ -243,10 +243,6 @@
       shareURLEl = document.querySelector("#shareurl"),
       errorEl = document.querySelector("#error");
 
-    if (new URL(window.location.href).searchParams.has("presentation")) {
-      document.body.classList.add("presentation");
-    }
-
     function show_status(text, hide) {
       hide = hide || 0;
       clearTimeout(t_stetus);
@@ -511,6 +507,10 @@
       } else {
         show_error({ message: `invalid engine ${engine} selected` });
       }
+    }
+
+    if (params.has("presentation")) {
+      document.body.classList.add("presentation");
     }
 
     if (params.has('raw')) {
