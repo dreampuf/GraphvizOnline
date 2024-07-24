@@ -10,6 +10,18 @@
             margin: 0 0;
         }
 
+        body.presentation #editor {
+            display: none;
+        }
+
+        body.presentation #options {
+            left: 0;
+        }
+
+        body.presentation #review {
+            left: 0;
+        }
+
         #editor {
             margin: 0;
             position: absolute;
@@ -230,6 +242,10 @@
       shareEl = document.querySelector("#share"),
       shareURLEl = document.querySelector("#shareurl"),
       errorEl = document.querySelector("#error");
+
+    if (new URL(window.location.href).searchParams.has("presentation")) {
+      document.body.classList.add("presentation");
+    }
 
     function show_status(text, hide) {
       hide = hide || 0;
