@@ -12,6 +12,10 @@ Example: https://dreampuf.github.io/GraphvizOnline/?url=https://gist.githubuserc
 
 Using https://gist.github.com/ allows you to share and version your graph definitions.
 
+## Presentation mode
+
+If you would like to display just the graph and not the graph input, you can add a `?presentation` query param. This can be helpful when generating links with the graph already prefilled.
+
 # How to implement this
 
 - [viz.js](https://github.com/mdaines/viz.js) This repo has compile graphviz(C) to javascript via [emscripten](https://github.com/kripken/emscripten).

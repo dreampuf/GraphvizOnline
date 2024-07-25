@@ -10,6 +10,18 @@
             margin: 0 0;
         }
 
+        body.presentation #editor {
+            display: none;
+        }
+
+        body.presentation #options {
+            left: 0;
+        }
+
+        body.presentation #review {
+            left: 0;
+        }
+
         #editor {
             margin: 0;
             position: absolute;
@@ -495,6 +507,10 @@
       } else {
         show_error({ message: `invalid engine ${engine} selected` });
       }
+    }
+
+    if (params.has("presentation")) {
+      document.body.classList.add("presentation");
     }
 
     if (params.has('raw')) {
