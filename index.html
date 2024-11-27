@@ -383,8 +383,13 @@
     }
 
     function updateState() {
-      var content = encodeURIComponent(editor.getSession().getDocument().getValue());
-      history.pushState({"content": content}, "", "#" + content)
+      const updatedUrl = new URL(window.location)
+      // Hash
+      const content = encodeURIComponent(editor.getSession().getDocument().getValue());
+      updatedUrl.hash = content
+      // Search params
+      updatedUrl.searchParams.set("engine", engineEl.value)
+      history.pushState({"content": content}, "", updatedUrl.toString())
     }
 
     function updateOutput(result) {
