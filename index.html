@@ -389,7 +389,7 @@
       updatedUrl.hash = content
       // Search params
       updatedUrl.searchParams.set("engine", engineEl.value)
-      history.pushState({"content": content}, "", updatedUrl.toString())
+      history.pushState({"content": content, "engine": engineEl.value}, "", updatedUrl.toString())
     }
 
     function updateOutput(result) {
