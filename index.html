@@ -172,9 +172,13 @@
             <option>circo</option>
             <option selected="">dot</option>
             <option>fdp</option>
+            <option>nop</option>
+            <option>nop2</option>
             <option>neato</option>
-            <option>osage</option>
+            <option>sfdp</option>
             <option>twopi</option>
+            <option>osage</option>
+            <option>patchwork</option>
         </select>
     </label>
 
@@ -182,7 +186,7 @@
         Format:
         <select>
             <option selected="">svg</option>
-            <option>png-image-element</option>
+            <option>png</option>
             <option>json</option>
             <option>xdot</option>
             <option>plain</option>
@@ -222,6 +226,8 @@
   crossorigin="anonymous"
   referrerpolicy="no-referrer"
 ></script>
+<script src="viz-standalone.js"></script>
+<script src="svg-pan-zoom.min.js" type="text/javascript" charset="utf-8"></script>
 <script>
   (function (document) {
     //http://stackoverflow.com/a/10372280/398634
@@ -255,10 +261,10 @@
     }
 
     function show_error(e) {
+      console.trace();
       show_status("error", 500);
       reviewer.classList.remove("working");
       reviewer.classList.add("error");
-
       var message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
       while (errorEl.firstChild) {
         errorEl.removeChild(errorEl.firstChild);
@@ -349,37 +355,32 @@
       reviewer.classList.add("working");
       reviewer.classList.remove("error");
 
-      if (worker) {
-        worker.terminate();
-      }
-
-      worker = new Worker("full.render.js");
-      worker.addEventListener("message", function (e) {
-        if (typeof e.data.error !== "undefined") {
-          var event = new CustomEvent("error", {"detail": new Error(e.data.error.message)});
-          worker.dispatchEvent(event);
-          return
-        }
-        show_status("done", 500);
-        reviewer.classList.remove("working");
-        reviewer.classList.remove("error");
-        updateOutput(e.data.result);
-      }, false);
-      worker.addEventListener('error', function (e) {
-        show_error(e.detail);
-      }, false);
-
       show_status("rendering...");
-      var params = {
-        "src": editor.getSession().getDocument().getValue(),
-        "id": new Date().toJSON(),
-        "options": {
-          "files": [],
-          "format": formatEl.value === "png-image-element" ? "svg" : formatEl.value,
-          "engine": engineEl.value
-        },
-      };
-      worker.postMessage(params);
+      Viz.instance().then(function(viz) {
+        let dotContent = editor.getSession().getDocument().getValue();
+        let options = {
+          format: formatEl.value,
+          engine: engineEl.value,
+        };
+        let result = null;
+
+        if (["svg", "png"].indexOf(formatEl.value) > -1) {
+          result = viz.renderSVGElement(dotContent, options);
+        } else {
+          result = viz.render(dotContent, options);
+        }
+
+        if (result.status !== undefined && result.status != "success") {
+          show_error(result.errors && result.errors.length > 0 && result.errors[0] || result);
+        } else {
+          updateOutput(result);
+        }
+      }).catch((err) => {
+        show_error(err);
+      }).finally(() => {
+        reviewer.classList.remove("working");
+        show_status("done", 500)
+      });
     }
 
     function updateState() {
@@ -419,38 +420,26 @@
       reviewer.classList.remove("error");
 
       if (formatEl.value == "svg" && !rawEl.checked) {
-        var svg = parser.parseFromString(result, "image/svg+xml");
-        //get svg source.
         var serializer = new XMLSerializer();
-        var source = serializer.serializeToString(svg);
-        //add name spaces.
-        if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
-            source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-        }
-        if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
-            source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-        }
-        //add xml declaration
-        if (!source.startsWith("<?xml version")) {
-            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-        }
+        var source = serializer.serializeToString(result);
         // https://stackoverflow.com/questions/18925210/download-blob-content-using-specified-charset
         //const blob = new Blob(["\ufeff", svg], {type: 'image/svg+xml;charset=utf-8'});
         const url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
         downloadBtn.href = url;
         downloadBtn.download = "graphviz.svg";
         var a = document.createElement("a");
-        var svgEl = svg.documentElement;
-        a.appendChild(svgEl);
+        a.appendChild(result);
         reviewer.appendChild(a);
-        svgPanZoom(svgEl, {
+        svgPanZoom(result, {
           zoomEnabled: true,
           controlIconsEnabled: true,
           fit: true,
           center: true,
         });
-      } else if (formatEl.value == "png-image-element") {
-        var resultWithPNGHeader = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(result)));
+      } else if (formatEl.value == "png") {
+        var serializer = new XMLSerializer();
+        var source = serializer.serializeToString(result);
+        let resultWithPNGHeader = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(source)));
         svgXmlToImage(resultWithPNGHeader, function (err, image) {
           if (err) {
             show_error(err)
@@ -466,6 +455,12 @@
       } else {
         var text = document.createElement("div");
         text.id = "text";
+        if (formatEl.value == "svg") {
+          let serializer = new XMLSerializer();
+          result = serializer.serializeToString(result);
+        } else {
+          result = result.output;
+        }
         text.appendChild(document.createTextNode(result));
         reviewer.appendChild(text);
       }
@@ -502,7 +497,7 @@
       return -1;
     };
 
-    /* come from sharing */
+    /* parsing from URL sharing */
     const params = new URLSearchParams(location.search.substring(1));
     if (params.has('engine')) {
       const engine = params.get('engine');
@@ -550,7 +545,5 @@
 
   })(document);
 </script>
-<script src="viz.js" type="text/javascript" charset="utf-8"></script>
-<script src="svg-pan-zoom.min.js" type="text/javascript" charset="utf-8"></script>
 </body>
 </html>
