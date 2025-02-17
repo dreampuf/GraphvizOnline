@@ -23,6 +23,23 @@
       left: 0;
     }
 
+    #editor-toggle {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      z-index: 10;
+      transform: translateY(-50%);
+    }
+
+    #toggle-btn {
+      cursor: pointer;
+      padding: 8px;
+      background: #eee;
+      border: 1px solid #ccc;
+      border-right: none;
+      border-radius: 4px 0 0 4px;
+    }
+
     #editor {
       margin: 0;
       position: absolute;
@@ -30,6 +47,13 @@
       bottom: 0;
       right: 50%;
       left: 0;
+      transition: width 0.3s ease;
+      width: 50%;
+    }
+
+    #editor.collapsed {
+      width: 0;
+      overflow: hidden;
     }
 
     #review {
@@ -40,6 +64,11 @@
       right: 0;
       left: 50%;
       overflow: scroll;
+      transition: left 0.3s ease;
+    }
+
+    #review.expanded {
+      left: 0;
     }
 
     #options {
@@ -47,14 +76,16 @@
       position: fixed;
       left: 50%;
       width: 100%;
-    }
-
-    #options {
       flex: 0 0 auto;
       background: #eee;
       border-bottom: 1px solid #ccc;
       padding: 8px;
       overflow: hidden;
+      transition: left 0.3s ease;
+    }
+
+    #options.expanded {
+      left: 0;
     }
 
     #options label {
@@ -142,6 +173,9 @@
 </head>
 
 <body>
+  <div id="editor-toggle">
+    <button id="toggle-btn">◀</button>
+  </div>
   <pre id="editor">digraph G {
 
   subgraph cluster_0 {
@@ -230,6 +264,46 @@
   <script src="viz-standalone.js"></script>
   <script src="svg-pan-zoom.min.js" type="text/javascript" charset="utf-8"></script>
   <script>
+    const editorElement = document.getElementById('editor');
+    const reviewElement = document.getElementById('review');
+    const optionsElement = document.getElementById('options');
+    const toggleBtn = document.getElementById('toggle-btn');
+
+    let isCollapsed = false;
+
+    toggleBtn.addEventListener('click', () => {
+      isCollapsed = !isCollapsed;
+
+      if (isCollapsed) {
+        editorElement.classList.add('collapsed');
+        reviewElement.classList.add('expanded');
+        optionsElement.classList.add('expanded');
+        toggleBtn.innerHTML = '▶';
+      } else {
+        editorElement.classList.remove('collapsed');
+        reviewElement.classList.remove('expanded');
+        optionsElement.classList.remove('expanded');
+        toggleBtn.innerHTML = '◀';
+      }
+
+      setTimeout(resizeSVG, 300);
+    });
+
+    window.addEventListener('resize', resizeSVG);
+
+    function resizeSVG() {
+      const svg = document.querySelector('#review svg');
+      if (svg) {
+        const panZoom = svgPanZoom(svg);
+        panZoom.resize();
+        panZoom.fit();
+        panZoom.center();
+
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+      }
+    }
+
     (function (document) {
       //http://stackoverflow.com/a/10372280/398634
       window.URL = window.URL || window.webkitURL;
@@ -550,7 +624,6 @@
 
     })(document);
   </script>
-  <iframe id="frame1" name="frame1" src="https://is.gd/create.php" frameborder="0"></iframe>
 </body>
 
 </html>
