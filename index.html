@@ -588,6 +588,16 @@
         }
       }
 
+      if (params.has('format')) {
+        const format = params.get('format');
+        const index = formatEl.options.indexOf(format);
+        if (index > -1) {
+          formatEl.selectedIndex = index;
+        } else {
+          show_error({ message: `Invalid format ${format} selected` });
+        }
+      }
+
       if (params.has("presentation")) {
         document.body.classList.add("presentation");
       }
