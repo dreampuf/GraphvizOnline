@@ -495,14 +495,26 @@ let isCollapsed = false; // Tracks the collapsed state of the editor panel; rema
       resizeSVG,
       copyShareURL,
       copyToClipboard,
-      handleEditorChange, // Added for testing
-      renderGraph,        // Added for testing
+      handleEditorChange,
+      renderGraph,
+      // For testing renderGraph and updateOutput
+      updateOutput,
+      generateGraphOutput,
+      manageRawUI,
+      clearReviewer,
+      _displaySvgInReviewer,
+      _displayTextOutputInReviewer,
+      _displayPngInReviewer, // Added for testing PNG output
+      svgXmlToImage,        // Added for testing PNG utility
+      updateState,
       domElements,
-      constants: { // Expose constants needed by tests
+      constants: {
         LAYOUT_ADJUST_DELAY_MS,
         LOADING_ANIMATION_INTERVAL_MS,
         STATUS_CLIPBOARD_AUTOHIDE_DELAY_MS,
-        RENDER_DEBOUNCE_DELAY_MS // Added for testing editor change handling
+        RENDER_DEBOUNCE_DELAY_MS,
+        STATUS_DONE_AUTOHIDE_DELAY_MS,
+        scale                   // Added for testing PNG (it's window.devicePixelRatio || 1)
       }
     };
   }

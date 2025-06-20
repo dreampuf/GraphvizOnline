@@ -25,6 +25,7 @@ describe('app.js tests', () => {
   let appScriptContent; // To store app.js content
   let appDomElements; // To store reference to domElements from app.js testingInterface
   let appConstants; // To store reference to constants from app.js
+  let appInterface; // To store reference to all exposed functions
 
   beforeAll(() => {
     // Read app.js content once
@@ -42,7 +43,7 @@ describe('app.js tests', () => {
       <div id="editor"></div>
       <div id="review"></div>
       <div id="options">
-        <div id="format"><select><option value="svg">SVG</option><option value="png">PNG</option></select></div>
+        <div id="format"><select><option value="svg">SVG</option><option value="png">PNG</option><option value="json">JSON</option></select></div>
         <div id="engine"><select><option value="dot">Dot</option><option value="circo">Circo</option></select></div>
         <div id="raw"><input type="checkbox" id="raw-checkbox-id"></div> <!-- Added id for direct access if needed -->
       </div>
@@ -67,6 +68,7 @@ describe('app.js tests', () => {
 
     // Store references from the testing interface after app.js has run
     if (window.testingInterface) {
+      appInterface = window.testingInterface;
       appDomElements = window.testingInterface.domElements;
       appConstants = window.testingInterface.constants;
     } else {
@@ -88,23 +90,23 @@ describe('app.js tests', () => {
     beforeEach(() => { statusEl = appDomElements.status; });
 
     test('should display status message', () => {
-      window.testingInterface.show_status('Test message');
+      appInterface.show_status('Test message');
       expect(statusEl.innerHTML).toBe('Test message');
     });
     test('should clear status after hideDelay', () => {
-      window.testingInterface.show_status('Temporary message', 1000);
+      appInterface.show_status('Temporary message', 1000);
       expect(statusEl.innerHTML).toBe('Temporary message');
       jest.advanceTimersByTime(1000);
       expect(statusEl.innerHTML).toBe('');
     });
     test('should clear previous timeout if called again', () => {
       const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
-      window.testingInterface.show_status('First message', 1000);
-      window.testingInterface.show_status('Second message', 500);
+      appInterface.show_status('First message', 1000);
+      appInterface.show_status('Second message', 500);
       expect(clearTimeoutSpy).toHaveBeenCalled();
     });
     test('should not clear status if hideDelay is 0 or not provided', () => {
-      window.testingInterface.show_status('Persistent message');
+      appInterface.show_status('Persistent message');
       expect(statusEl.innerHTML).toBe('Persistent message');
       jest.advanceTimersByTime(5000);
       expect(statusEl.innerHTML).toBe('Persistent message');
@@ -124,28 +126,28 @@ describe('app.js tests', () => {
     });
 
     test('should display error message with title', () => {
-      window.testingInterface.show_error('Something broke', 'Test Error');
+      appInterface.show_error('Something broke', 'Test Error');
       expect(errorEl.textContent).toBe('Test Error: Something broke');
       expect(reviewEl.classList.contains('error')).toBe(true);
       expect(reviewEl.classList.contains('working')).toBe(false);
     });
     test('should use default title "Error" if not provided', () => {
-      window.testingInterface.show_error(new Error('Network failed'));
+      appInterface.show_error(new Error('Network failed'));
       expect(errorEl.textContent).toBe('Error: Network failed');
     });
     test('should display string error if error is not an Error object', () => {
-      window.testingInterface.show_error('A simple string error');
+      appInterface.show_error('A simple string error');
       expect(errorEl.textContent).toBe('Error: A simple string error');
     });
     test('should update status bar with title and clear it after delay', () => {
-      window.testingInterface.show_error('Bad stuff happened', 'Custom Error Title');
+      appInterface.show_error('Bad stuff happened', 'Custom Error Title');
       expect(statusEl.innerHTML).toBe('Custom Error Title');
       jest.advanceTimersByTime(STATUS_ERROR_AUTOHIDE_DELAY_MS);
       expect(statusEl.innerHTML).toBe('');
     });
     test('should set review panel classes correctly', () => {
       reviewEl.classList.add('working');
-      window.testingInterface.show_error('Test error');
+      appInterface.show_error('Test error');
       expect(reviewEl.classList.contains('error')).toBe(true);
       expect(reviewEl.classList.contains('working')).toBe(false);
     });
@@ -158,7 +160,7 @@ describe('app.js tests', () => {
       mockSelectElement = document.createElement('select');
       mockSelectElement.innerHTML = `<option value="val1">Opt1</option><option value="val2">Opt2</option>`;
       document.body.appendChild(mockSelectElement);
-      showErrorSpy = jest.spyOn(window.testingInterface, 'show_error');
+      showErrorSpy = jest.spyOn(appInterface, 'show_error');
     });
     afterEach(() => {
       document.body.removeChild(mockSelectElement);
@@ -166,21 +168,21 @@ describe('app.js tests', () => {
 
     test('should select the correct option if param exists and value is valid', () => {
       const params = new URLSearchParams('?myparam=val2');
-      window.testingInterface.selectOptionFromUrlParams('myparam', mockSelectElement, params, window.testingInterface.show_error);
+      appInterface.selectOptionFromUrlParams('myparam', mockSelectElement, params, appInterface.show_error);
       expect(mockSelectElement.value).toBe('val2');
       expect(showErrorSpy).not.toHaveBeenCalled();
     });
     test('should not change selection if param does not exist', () => {
       mockSelectElement.value = 'val1';
       const params = new URLSearchParams('?otherparam=val2');
-      window.testingInterface.selectOptionFromUrlParams('myparam', mockSelectElement, params, window.testingInterface.show_error);
+      appInterface.selectOptionFromUrlParams('myparam', mockSelectElement, params, appInterface.show_error);
       expect(mockSelectElement.value).toBe('val1');
       expect(showErrorSpy).not.toHaveBeenCalled();
     });
     test('should call showErrorFn if param exists but value is invalid', () => {
       const params = new URLSearchParams('?myparam=invalidVal');
       mockSelectElement.value = 'val1';
-      window.testingInterface.selectOptionFromUrlParams('myparam', mockSelectElement, params, window.testingInterface.show_error);
+      appInterface.selectOptionFromUrlParams('myparam', mockSelectElement, params, appInterface.show_error);
       expect(mockSelectElement.value).toBe('val1');
       expect(showErrorSpy).toHaveBeenCalledWith(expect.objectContaining({ message: "Invalid 'myparam' parameter: invalidVal" }), "URL Parameter Error");
     });
@@ -198,7 +200,7 @@ describe('app.js tests', () => {
       reviewEl.classList.remove('expanded');
       optionsEl.classList.remove('expanded');
       toggleBtnEl.innerHTML = '◀';
-      resizeSVGSpy = jest.spyOn(window.testingInterface, 'resizeSVG');
+      resizeSVGSpy = jest.spyOn(appInterface, 'resizeSVG');
     });
 
     test('should toggle to collapsed state on first click', () => {
@@ -237,7 +239,7 @@ describe('app.js tests', () => {
     afterEach(() => { reviewEl.innerHTML = ''; window.svgPanZoom.mockClear(); });
 
     test('should call svgPanZoom methods if SVG exists', () => {
-      window.testingInterface.resizeSVG();
+      appInterface.resizeSVG();
       expect(window.svgPanZoom).toHaveBeenCalledWith(mockSvgElement);
       expect(mockPanZoomInstance.resize).toHaveBeenCalledTimes(1);
       expect(mockPanZoomInstance.fit).toHaveBeenCalledTimes(1);
@@ -247,7 +249,7 @@ describe('app.js tests', () => {
     });
     test('should not throw or call svgPanZoom methods if SVG does not exist', () => {
       reviewEl.innerHTML = '';
-      expect(() => window.testingInterface.resizeSVG()).not.toThrow();
+      expect(() => appInterface.resizeSVG()).not.toThrow();
       expect(window.svgPanZoom).not.toHaveBeenCalled();
     });
   });
@@ -262,9 +264,9 @@ describe('app.js tests', () => {
       shareUrlInputEl = appDomElements.shareUrlInput;
       mockEditor = window.ace.edit();
 
-      showStatusSpy = jest.spyOn(window.testingInterface, 'show_status');
-      copyToClipboardSpy = jest.spyOn(window.testingInterface, 'copyToClipboard');
-      showErrorSpy = jest.spyOn(window.testingInterface, 'show_error');
+      showStatusSpy = jest.spyOn(appInterface, 'show_status');
+      copyToClipboardSpy = jest.spyOn(appInterface, 'copyToClipboard');
+      showErrorSpy = jest.spyOn(appInterface, 'show_error');
 
       shareBtnEl.disabled = false;
       shareBtnEl.value = 'Share';
@@ -277,7 +279,7 @@ describe('app.js tests', () => {
 
     test('should generate, display share URL, and show success on copy', () => {
       copyToClipboardSpy.mockReturnValue(true);
-      window.testingInterface.copyShareURL();
+      appInterface.copyShareURL();
       expect(window.LZString.compressToEncodedURIComponent).toHaveBeenCalledWith('graph G {}');
       const expectedShareUrl = new URL(window.location.href);
       expectedShareUrl.search = '';
@@ -299,7 +301,7 @@ describe('app.js tests', () => {
 
     test('should show generated status if copyToClipboard fails', () => {
       copyToClipboardSpy.mockReturnValue(false);
-      window.testingInterface.copyShareURL();
+      appInterface.copyShareURL();
       jest.runAllTimers();
       expect(showStatusSpy).toHaveBeenCalledWith('Share URL generated.', appConstants.STATUS_CLIPBOARD_AUTOHIDE_DELAY_MS);
     });
@@ -308,7 +310,7 @@ describe('app.js tests', () => {
       window.LZString.compressToEncodedURIComponent.mockImplementation(() => {
         throw new Error('Test Compression failed');
       });
-      window.testingInterface.copyShareURL();
+      appInterface.copyShareURL();
       jest.runAllTimers();
       expect(showErrorSpy).toHaveBeenCalledWith(
         expect.objectContaining({ message: 'Could not generate shareable URL. Content might be too large.' }),
@@ -327,13 +329,13 @@ describe('app.js tests', () => {
 
     test('should attempt to copy string to clipboard and return true on success', () => {
         mockExecCommand.mockReturnValue(true);
-        const result = window.testingInterface.copyToClipboard('test string');
+        const result = appInterface.copyToClipboard('test string');
         expect(mockExecCommand).toHaveBeenCalledWith('copy');
         expect(result).toBe(true);
     });
     test('should return false if execCommand fails', () => {
         mockExecCommand.mockReturnValue(false);
-        const result = window.testingInterface.copyToClipboard('test string');
+        const result = appInterface.copyToClipboard('test string');
         expect(mockExecCommand).toHaveBeenCalledWith('copy');
         expect(result).toBe(false);
     });
@@ -342,7 +344,7 @@ describe('app.js tests', () => {
         const appendChildSpy = jest.spyOn(document.body, 'appendChild');
         const removeChildSpy = jest.spyOn(document.body, 'removeChild');
         mockExecCommand.mockReturnValue(true);
-        window.testingInterface.copyToClipboard(testString);
+        appInterface.copyToClipboard(testString);
         expect(appendChildSpy).toHaveBeenCalledWith(expect.any(HTMLTextAreaElement));
         const textArea = appendChildSpy.mock.calls[0][0];
         expect(textArea.value).toBe(testString);
@@ -352,41 +354,29 @@ describe('app.js tests', () => {
     });
   });
 
-  // --- Tests for event handlers triggering renderGraph ---
-
   describe('Editor Change Handling (handleEditorChange)', () => {
     let mockEditor;
     let renderGraphSpy;
-
     beforeEach(() => {
-      mockEditor = window.ace.edit(); // Get the mock editor instance
-      renderGraphSpy = jest.spyOn(window.testingInterface, 'renderGraph');
-      // Ensure the mock 'on' function is clean for each test if necessary
+      mockEditor = window.ace.edit();
+      renderGraphSpy = jest.spyOn(appInterface, 'renderGraph');
       mockEditor.session.on.mockClear();
-      // Re-attach handler since app.js runs in global beforeEach.
-      // This ensures we capture the call to 'on' for THIS test's mockEditor instance's session.
-      // (Actually, app.js already attached it to the mockEditor instance created by window.ace.edit()
-      // when the script ran. So, this re-attachment is not needed and might be confusing.
-      // We just need to get the callback that app.js registered.)
     });
 
     test('should call renderGraph after debounce period on editor change', () => {
-      // Find the 'change' callback registered by app.js on the mock editor's session
       let changeCallback;
       const callWithChange = mockEditor.session.on.mock.calls.find(call => call[0] === 'change');
-      if (callWithChange) {
-        changeCallback = callWithChange[1];
-      }
-      expect(changeCallback).toBeDefined(); // Ensure the callback was registered
-      expect(changeCallback).toBe(window.testingInterface.handleEditorChange);
-
-      changeCallback(); // Call the handler
-
+      if (callWithChange) { changeCallback = callWithChange[1]; }
+      // This check might fail if app.js's event listener was attached to a *different* mock session object
+      // than the one we get from window.ace.edit() *in this beforeEach*.
+      // This depends on how the ace.edit mock is structured and if it returns the same session object.
+      // The current ace mock returns a persistent mockEditor object.
+      expect(changeCallback).toBeDefined();
+      expect(changeCallback).toBe(appInterface.handleEditorChange);
+      changeCallback();
       expect(renderGraphSpy).not.toHaveBeenCalled();
-
       jest.advanceTimersByTime(appConstants.RENDER_DEBOUNCE_DELAY_MS - 1);
       expect(renderGraphSpy).not.toHaveBeenCalled();
-
       jest.advanceTimersByTime(1);
       expect(renderGraphSpy).toHaveBeenCalledTimes(1);
     });
@@ -394,17 +384,12 @@ describe('app.js tests', () => {
     test('should clear previous debounce timeout if changes occur rapidly', () => {
       let changeCallback;
       const callWithChange = mockEditor.session.on.mock.calls.find(call => call[0] === 'change');
-      if (callWithChange) {
-        changeCallback = callWithChange[1];
-      }
+      if (callWithChange) { changeCallback = callWithChange[1]; }
       expect(changeCallback).toBeDefined();
-
       changeCallback();
       jest.advanceTimersByTime(appConstants.RENDER_DEBOUNCE_DELAY_MS / 2);
       changeCallback();
-
       expect(renderGraphSpy).not.toHaveBeenCalled();
-
       jest.advanceTimersByTime(appConstants.RENDER_DEBOUNCE_DELAY_MS);
       expect(renderGraphSpy).toHaveBeenCalledTimes(1);
     });
@@ -413,30 +398,163 @@ describe('app.js tests', () => {
   describe('Input Element Change Handling (format, engine, raw)', () => {
     let formatSelectEl, engineSelectEl, rawInputEl;
     let renderGraphSpy;
-
     beforeEach(() => {
       formatSelectEl = appDomElements.formatSelect;
       engineSelectEl = appDomElements.engineSelect;
       rawInputEl = appDomElements.rawInput;
-      renderGraphSpy = jest.spyOn(window.testingInterface, 'renderGraph');
+      renderGraphSpy = jest.spyOn(appInterface, 'renderGraph');
     });
 
     test('should call renderGraph when formatEl changes', () => {
-      const event = new Event('change');
-      formatSelectEl.dispatchEvent(event);
+      formatSelectEl.dispatchEvent(new Event('change'));
       expect(renderGraphSpy).toHaveBeenCalledTimes(1);
     });
-
     test('should call renderGraph when engineEl changes', () => {
-      const event = new Event('change');
-      engineSelectEl.dispatchEvent(event);
+      engineSelectEl.dispatchEvent(new Event('change'));
       expect(renderGraphSpy).toHaveBeenCalledTimes(1);
     });
-
     test('should call renderGraph when rawEl changes', () => {
-      const event = new Event('change');
-      rawInputEl.dispatchEvent(event);
+      rawInputEl.dispatchEvent(new Event('change'));
       expect(renderGraphSpy).toHaveBeenCalledTimes(1);
     });
   });
+
+  // --- Tests for Graph Rendering Pipeline (SVG and Raw SVG) ---
+  describe('Graph Rendering Pipeline (SVG and Raw SVG)', () => {
+    let mockEditor;
+    let mockGraphvizInstanceDotSpy;
+
+    beforeEach(() => {
+      mockEditor = window.ace.edit();
+      mockEditor.session.getDocument.mockReturnValue({ getValue: jest.fn().mockReturnValue('graph G {}') });
+
+      appDomElements.formatSelect.value = 'svg';
+      appDomElements.engineSelect.value = 'dot';
+      appDomElements.rawInput.checked = false;
+      appDomElements.review.innerHTML = '';
+      appDomElements.review.classList.remove('error', 'working');
+      appDomElements.errorContainer.innerHTML = '';
+
+      const resolvedGraphvizInstance = {
+        dot: jest.fn().mockReturnValue('<svg><!-- mock SVG --></svg>')
+      };
+      mockGraphvizInstanceDotSpy = resolvedGraphvizInstance.dot;
+      window.Graphviz.load.mockResolvedValue(resolvedGraphvizInstance);
+
+      jest.spyOn(appInterface, 'updateOutput').mockClear();
+      jest.spyOn(appInterface, 'show_error').mockClear();
+      jest.spyOn(appInterface, 'show_status').mockClear();
+      jest.spyOn(appInterface, '_displaySvgInReviewer').mockClear();
+      jest.spyOn(appInterface, '_displayTextOutputInReviewer').mockClear();
+      jest.spyOn(appInterface, 'clearReviewer').mockClear();
+      jest.spyOn(appInterface, 'manageRawUI').mockClear();
+      if (appInterface.updateState) {
+          jest.spyOn(appInterface, 'updateState').mockClear();
+      }
+      window.svgPanZoom.mockClear().mockReturnValue({ resize: jest.fn(), fit: jest.fn(), center: jest.fn() });
+    });
+
+    describe('renderGraph (SVG output)', () => {
+      test('should successfully render non-raw SVG output', async () => {
+        await appInterface.renderGraph();
+        expect(appInterface.show_status).toHaveBeenCalledWith('rendering...');
+        expect(window.Graphviz.load).toHaveBeenCalledTimes(1);
+        expect(mockGraphvizInstanceDotSpy).toHaveBeenCalledWith('graph G {}', { engine: 'dot' });
+        expect(appInterface.updateOutput).toHaveBeenCalledTimes(1);
+        const updateOutputArgs = appInterface.updateOutput.mock.calls[0][0];
+        expect(updateOutputArgs instanceof Element && updateOutputArgs.tagName.toLowerCase() === 'svg').toBe(true);
+        expect(updateOutputArgs.innerHTML).toContain('<!-- mock SVG -->');
+        expect(appDomElements.review.classList.contains('working')).toBe(false);
+        expect(appInterface.show_status).toHaveBeenCalledWith('done', appConstants.STATUS_DONE_AUTOHIDE_DELAY_MS);
+        expect(appInterface.show_error).not.toHaveBeenCalled();
+      });
+
+      test('should successfully render raw SVG output (as text via updateOutput)', async () => {
+        appDomElements.rawInput.checked = true;
+        await appInterface.renderGraph();
+        expect(mockGraphvizInstanceDotSpy).toHaveBeenCalledWith('graph G {}', { engine: 'dot' });
+        expect(appInterface.updateOutput).toHaveBeenCalledTimes(1);
+        const updateOutputArgs = appInterface.updateOutput.mock.calls[0][0];
+        expect(updateOutputArgs instanceof Element && updateOutputArgs.tagName.toLowerCase() === 'svg').toBe(true);
+      });
+
+      test('should handle Graphviz rendering error (from dot method)', async () => {
+        mockGraphvizInstanceDotSpy.mockImplementation(() => { throw new Error('Graphviz failed'); });
+        await appInterface.renderGraph();
+        expect(appInterface.show_error).toHaveBeenCalledWith(expect.any(Error), 'Graph Rendering Failed');
+        expect(appDomElements.review.classList.contains('error')).toBe(true);
+        expect(appDomElements.review.classList.contains('working')).toBe(false);
+        expect(appInterface.updateOutput).not.toHaveBeenCalled();
+      });
+
+      test('should handle Graphviz.load() rejection', async () => {
+        window.Graphviz.load.mockRejectedValue(new Error('Failed to load Graphviz'));
+        await appInterface.renderGraph();
+        expect(appInterface.show_error).toHaveBeenCalledWith(expect.any(Error), 'Graph Rendering Failed');
+        expect(appDomElements.review.classList.contains('error')).toBe(true);
+        expect(appDomElements.review.classList.contains('working')).toBe(false);
+      });
+    });
+
+    describe('updateOutput (SVG/Raw SVG)', () => {
+      let mockSvgElement;
+      beforeEach(() => {
+          const parser = new DOMParser();
+          mockSvgElement = parser.parseFromString('<svg id="graphviz-svg"><g/></svg>', "image/svg+xml").documentElement;
+      });
+
+      test('should correctly display non-raw SVG', () => {
+        appDomElements.formatSelect.value = 'svg';
+        appDomElements.rawInput.checked = false;
+        appInterface.updateOutput(mockSvgElement);
+        expect(appInterface.manageRawUI).toHaveBeenCalledWith('svg');
+        expect(appInterface.clearReviewer).toHaveBeenCalledTimes(1);
+        expect(appInterface._displaySvgInReviewer).toHaveBeenCalledWith(mockSvgElement, appDomElements.review, appDomElements.downloadBtn, false);
+        expect(appInterface._displayTextOutputInReviewer).not.toHaveBeenCalled();
+        if (appInterface.updateState) expect(appInterface.updateState).toHaveBeenCalledTimes(1);
+      });
+
+      test('should correctly display raw SVG (as text)', () => {
+        appDomElements.formatSelect.value = 'svg';
+        appDomElements.rawInput.checked = true;
+        appInterface.updateOutput(mockSvgElement);
+        expect(appInterface.manageRawUI).toHaveBeenCalledWith('svg');
+        expect(appInterface.clearReviewer).toHaveBeenCalledTimes(1);
+        expect(appInterface._displayTextOutputInReviewer).toHaveBeenCalledWith('svg', mockSvgElement, appDomElements.review);
+        expect(appInterface._displaySvgInReviewer).not.toHaveBeenCalled();
+        if (appInterface.updateState) expect(appInterface.updateState).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('_displaySvgInReviewer', () => {
+      test('should append SVG and initialize svgPanZoom', () => {
+          const reviewEl = appDomElements.review;
+          const dlBtn = appDomElements.downloadBtn;
+          const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          reviewEl.innerHTML = '';
+          appInterface._displaySvgInReviewer(svg, reviewEl, dlBtn, false);
+          expect(reviewEl.querySelector('a > svg')).toBe(svg);
+          expect(window.svgPanZoom).toHaveBeenCalledWith(svg, expect.objectContaining({ fit: true, center: true }));
+          expect(dlBtn.href).toMatch(/^data:image\/svg\+xml;charset=utf-8,/);
+          expect(dlBtn.download).toBe('graphviz.svg');
+      });
+    });
+
+    describe('_displayTextOutputInReviewer (for raw SVG)', () => {
+      test('should display serialized SVG string when format is svg (raw)', () => {
+          const reviewEl = appDomElements.review;
+          const svgString = '<svg><g id="mygroup"></g></svg>';
+          const parser = new DOMParser();
+          const svgElement = parser.parseFromString(svgString, "image/svg+xml").documentElement;
+          reviewEl.innerHTML = '';
+          appInterface._displayTextOutputInReviewer('svg', svgElement, reviewEl);
+          const textDiv = reviewEl.querySelector('#text');
+          expect(textDiv).not.toBeNull();
+          expect(textDiv.textContent).toContain('<g id="mygroup"/>');
+          expect(textDiv.textContent.trim().startsWith('<svg')).toBe(true);
+      });
+    });
+  });
 });
+
+[end of app.test.js]
