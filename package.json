@@ -1,0 +1,22 @@
+{
+  "name": "graphviz-online-editor",
+  "version": "1.0.0",
+  "description": "A web-based Graphviz editor",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "babel-jest": "^27.5.1"
+  },
+  "keywords": [
+    "graphviz",
+    "editor",
+    "visualization"
+  ],
+  "author": "",
+  "license": "MIT"
+}

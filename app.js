@@ -20,36 +20,11 @@ const domElements = {
 };
 
 // --- UI State ---
-let isCollapsed = false; // Tracks the collapsed state of the editor panel
+let isCollapsed = false; // Tracks the collapsed state of the editor panel; remains global for handleToggleClick if it stays outside IIFE.
 
-// --- Event Handlers (Attached to elements outside IIFE) ---
+// Event Handlers like handleToggleClick will be moved inside the IIFE if they are to be exposed via testingInterface.
+// domElements.toggleBtn.addEventListener('click', handleToggleClick); // This attachment will also move.
 
-/**
- * Handles the click event on the toggle button to collapse/expand the editor panel.
- */
-function handleToggleClick() {
-  isCollapsed = !isCollapsed;
-
-  if (isCollapsed) {
-    domElements.editor.classList.add('collapsed');
-    domElements.review.classList.add('expanded');
-    domElements.options.classList.add('expanded');
-    domElements.toggleBtn.innerHTML = '▶'; // Change icon to indicate "expand"
-  } else {
-    domElements.editor.classList.remove('collapsed');
-    domElements.review.classList.remove('expanded');
-    domElements.options.classList.remove('expanded');
-    domElements.toggleBtn.innerHTML = '◀'; // Change icon to indicate "collapse"
-  }
-
-  // Adjust SVG size after a short delay to allow for CSS transitions.
-  // resizeSVG is defined within the IIFE and will be accessible.
-  setTimeout(resizeSVG, LAYOUT_ADJUST_DELAY_MS);
-}
-
-domElements.toggleBtn.addEventListener('click', handleToggleClick); // Attach click handler to the toggle button
-
-// window.addEventListener('resize', resizeSVG); // This will be moved into IIFE after resizeSVG definition
 
 // --- Main Application Logic (IIFE) ---
 // Encapsulates the core application logic to avoid polluting the global scope.
@@ -59,6 +34,7 @@ domElements.toggleBtn.addEventListener('click', handleToggleClick); // Attach cl
 
   // --- Constants ---
   const RENDER_DEBOUNCE_DELAY_MS = 1500; // Delay for debouncing graph rendering on editor changes.
+  // LAYOUT_ADJUST_DELAY_MS is defined here and used by handleToggleClick
   const LAYOUT_ADJUST_DELAY_MS = 300;   // Delay for UI adjustments after layout changes (e.g., panel collapse).
   const LOADING_ANIMATION_INTERVAL_MS = 300; // Interval for the loading animation dots.
   const STATUS_AUTOHIDE_DELAY_MS = 500;    // Default auto-hide delay for status messages.
@@ -72,6 +48,30 @@ domElements.toggleBtn.addEventListener('click', handleToggleClick); // Attach cl
   window.URL = window.URL || window.webkitURL;
 
   // --- Core Functions & State ---
+
+  // isCollapsed is a script-level global, domElements is a script-level const.
+  // resizeSVG is defined below.
+  /**
+   * Handles the click event on the toggle button to collapse/expand the editor panel.
+   * Moved inside IIFE for testability and better encapsulation.
+   */
+  function handleToggleClick() {
+    isCollapsed = !isCollapsed; // Modifies script-level global state
+
+    if (isCollapsed) {
+      domElements.editor.classList.add('collapsed');
+      domElements.review.classList.add('expanded');
+      domElements.options.classList.add('expanded');
+      domElements.toggleBtn.innerHTML = '▶'; // Change icon to indicate "expand"
+    } else {
+      domElements.editor.classList.remove('collapsed');
+      domElements.review.classList.remove('expanded');
+      domElements.options.classList.remove('expanded');
+      domElements.toggleBtn.innerHTML = '◀'; // Change icon to indicate "collapse"
+    }
+    setTimeout(resizeSVG, LAYOUT_ADJUST_DELAY_MS);
+  }
+
 
   /**
    * Resizes the SVG element in the review panel to fit and center its content.
@@ -92,6 +92,9 @@ domElements.toggleBtn.addEventListener('click', handleToggleClick); // Attach cl
   }
   // Attach event listener for window resize to adjust SVG.
   window.addEventListener('resize', resizeSVG);
+  // Event listener for toggle button moved inside IIFE
+  domElements.toggleBtn.addEventListener('click', handleToggleClick);
+
 
   let statusClearTimeoutId = -1; // Timeout ID for clearing the status message.
   const scale = window.devicePixelRatio || 1; // Device pixel ratio for scaling images.
@@ -480,6 +483,28 @@ domElements.toggleBtn.addEventListener('click', handleToggleClick); // Attach cl
     editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
   } else if (editor.getValue()) { // Init
     renderGraph();
+  }
+
+  // Expose functions and variables for testing if in a JEST environment
+  if (typeof JEST_TEST_ENV !== 'undefined' && JEST_TEST_ENV) {
+    window.testingInterface = {
+      show_status,
+      show_error,
+      selectOptionFromUrlParams,
+      handleToggleClick,
+      resizeSVG,
+      copyShareURL,
+      copyToClipboard,
+      handleEditorChange, // Added for testing
+      renderGraph,        // Added for testing
+      domElements,
+      constants: { // Expose constants needed by tests
+        LAYOUT_ADJUST_DELAY_MS,
+        LOADING_ANIMATION_INTERVAL_MS,
+        STATUS_CLIPBOARD_AUTOHIDE_DELAY_MS,
+        RENDER_DEBOUNCE_DELAY_MS // Added for testing editor change handling
+      }
+    };
   }
 
 })(document, LZString); // Pass LZString global to the IIFE
