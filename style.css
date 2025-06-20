@@ -1,0 +1,163 @@
+body {
+      overflow: hidden;
+      margin: 0 0;
+    }
+
+    body.presentation #editor {
+      display: none;
+    }
+
+    body.presentation #options {
+      left: 0;
+    }
+
+    body.presentation #review {
+      left: 0;
+    }
+
+    #editor-toggle {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      z-index: 10;
+      transform: translateY(-50%);
+    }
+
+    #toggle-btn {
+      cursor: pointer;
+      padding: 8px;
+      background: #eee;
+      border: 1px solid #ccc;
+      border-right: none;
+      border-radius: 4px 0 0 4px;
+    }
+
+    #editor {
+      margin: 0;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 50%;
+      left: 0;
+      transition: width 0.3s ease;
+      width: 50%;
+    }
+
+    #editor.collapsed {
+      width: 0;
+      overflow: hidden;
+    }
+
+    #review {
+      margin: 0;
+      position: absolute;
+      top: 50px;
+      bottom: 0;
+      right: 0;
+      left: 50%;
+      overflow: scroll;
+      transition: left 0.3s ease;
+    }
+
+    #review.expanded {
+      left: 0;
+    }
+
+    #options {
+      margin: 0;
+      position: fixed;
+      left: 50%;
+      width: 100%;
+      flex: 0 0 auto;
+      background: #eee;
+      border-bottom: 1px solid #ccc;
+      padding: 8px;
+      overflow: hidden;
+      transition: left 0.3s ease;
+    }
+
+    #options.expanded {
+      left: 0;
+    }
+
+    #options label {
+      margin-right: 8px;
+    }
+
+    #options #raw.disabled {
+      opacity: 0.5;
+    }
+
+    #shareurl {
+      display: none;
+    }
+
+    #status {
+      width: 100%;
+      position: fixed;
+      bottom: 0;
+      display: block;
+      color: #FFF;
+      z-index: 999;
+    }
+
+    #review svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #review #text {
+      font-size: 12px;
+      font-family: monaco, courier, monospace;
+      white-space: pre;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+
+    #review img {
+      display: block;
+      margin: 0 auto;
+    }
+
+    #review.working svg,
+    #output.error svg,
+    #review.working #text,
+    #output.error #text,
+    #review.working img,
+    #output.error img {
+      opacity: 0.4;
+    }
+
+    #review.error #error {
+      display: inherit;
+    }
+
+    #review #error {
+      display: none;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      margin-right: 20px;
+      background: red;
+      color: white;
+      z-index: 1;
+    }
+
+    #download {
+      font: bold 12px Arial;
+      text-decoration: none;
+      background-color: #EEEEEE;
+      color: #333333;
+      padding: 2px 6px 2px 6px;
+      border-top: 1px solid #CCCCCC;
+      border-right: 1px solid #333333;
+      border-bottom: 1px solid #333333;
+      border-left: 1px solid #CCCCCC;
+    }

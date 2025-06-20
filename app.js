@@ -1,3 +1,5 @@
+import { Graphviz } from "https://cdn.jsdelivr.net/npm/@hpcc-js/wasm-graphviz@1.7.0/dist/index.js";
+"use strict";
 // Content of the first small script block
 const editorElement = document.getElementById('editor');
 const reviewElement = document.getElementById('review');
@@ -12,7 +14,7 @@ function resizeSVG() {
   const svg = document.querySelector('#review svg');
   if (svg) {
     // svgPanZoom is a global from the svg-pan-zoom.min.js library
-    const panZoomInstance = svgPanZoom(svg); 
+    const panZoomInstance = svgPanZoom(svg);
     panZoomInstance.resize();
     panZoomInstance.fit();
     panZoomInstance.center();
@@ -44,31 +46,33 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
 
 // Main script block (IIFE)
 (function (document) {
+  "use strict";
   //http://stackoverflow.com/a/10372280/398634
   window.URL = window.URL || window.webkitURL;
-  var el_stetus = document.getElementById("status"),
-    t_stetus = -1,
-    reviewer = document.getElementById("review"),
-    scale = window.devicePixelRatio || 1,
-    downloadBtn = document.getElementById("download"),
-    editor = ace.edit("editor"),
-    lastHD = -1,
-    worker = null,
-    parser = new DOMParser(),
-    showError = null,
-    formatEl = document.querySelector("#format select"),
-    engineEl = document.querySelector("#engine select"),
-    rawEl = document.querySelector("#raw input"),
-    shareEl = document.querySelector("#share"),
-    shareURLEl = document.querySelector("#shareurl"),
-    errorEl = document.querySelector("#error");
+  const el_stetus = document.getElementById("status");
+  let t_stetus = -1;
+  const reviewer = document.getElementById("review");
+  const scale = window.devicePixelRatio || 1;
+  const downloadBtn = document.getElementById("download");
+  const editor = ace.edit("editor");
+  let lastHD = -1;
+  let worker = null; // Assuming it might be assigned later
+  const parser = new DOMParser();
+  // showError is a function declaration, so it's hoisted and effectively constant.
+  // const showError = null; // This would be if it were a variable meant to be assigned a function expression.
+  const formatEl = document.querySelector("#format select");
+  const engineEl = document.querySelector("#engine select");
+  const rawEl = document.querySelector("#raw input");
+  const shareEl = document.querySelector("#share");
+  const shareURLEl = document.querySelector("#shareurl");
+  const errorEl = document.querySelector("#error");
 
   function show_status(text, hide) {
     hide = hide || 0;
     clearTimeout(t_stetus);
     el_stetus.innerHTML = text;
     if (hide) {
-      t_stetus = setTimeout(function () {
+      t_stetus = setTimeout(() => {
         el_stetus.innerHTML = "";
       }, hide);
     }
@@ -79,7 +83,7 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
     show_status("error", 500);
     reviewer.classList.remove("working");
     reviewer.classList.add("error");
-    var message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
+    const message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
     while (errorEl.firstChild) {
       errorEl.removeChild(errorEl.firstChild);
     }
@@ -87,14 +91,14 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
   }
 
   function svgXmlToImage(svgXml, callback) {
-    var pngImage = new Image(), svgImage = new Image();
+    const pngImage = new Image(), svgImage = new Image();
 
-    svgImage.onload = function () {
-      var canvas = document.createElement("canvas");
+    svgImage.onload = () => {
+      const canvas = document.createElement("canvas");
       canvas.width = svgImage.width * scale;
       canvas.height = svgImage.height * scale;
 
-      var context = canvas.getContext("2d");
+      const context = canvas.getContext("2d");
       context.drawImage(svgImage, 0, 0, canvas.width, canvas.height);
 
       pngImage.src = canvas.toDataURL("image/png");
@@ -104,22 +108,22 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
       if (callback !== undefined) {
         callback(null, pngImage);
       }
-    }
+    };
 
-    svgImage.onerror = function (e) {
+    svgImage.onerror = (e) => {
       if (callback !== undefined) {
         callback(e);
       }
-    }
+    };
     svgImage.src = svgXml;
   }
 
   function copyShareURL(e) {
     let rawContent = editor.getSession().getDocument().getValue();
-    
+
     shareEl.disabled = true;
     let n = 0;
-    // animateId is declared in the IIFE scope if not already. 
+    // animateId is declared in the IIFE scope if not already.
     // If it's local to this function, its declaration should be `let animateId = ...`
     // Assuming animateId is accessible from outer scope as per instructions.
     let animateId = setInterval(()=> { shareEl.value = "Loading" + ".".repeat(n++%3)}, 300);
@@ -131,12 +135,12 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
         compressedUrl.hash = '';   // Clear existing hash
 
         compressedUrl.searchParams.set("compressed", compressedContent);
-        compressedUrl.searchParams.set("engine", engineEl.value); 
-        compressedUrl.searchParams.set("format", formatEl.value); 
-        
+        compressedUrl.searchParams.set("engine", engineEl.value);
+        compressedUrl.searchParams.set("format", formatEl.value);
+
         shareURLEl.style.display = "inline";
         shareURLEl.value = compressedUrl.toString();
-        
+
         if (copyToClipboard(compressedUrl.toString())) {
             show_status("Share URL copied to clipboard!", 2000);
         } else {
@@ -149,8 +153,8 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
         shareURLEl.style.display = "none";
         shareURLEl.value = ''; // Clear value on error
     } finally {
-        clearInterval(animateId); 
-        shareEl.value = "Share";   
+        clearInterval(animateId);
+        shareEl.value = "Share";
         shareEl.disabled = false;
     }
   }
@@ -167,7 +171,7 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
         ? document.getSelection().getRangeAt(0)
         : false;
     el.select();
-    var result = document.execCommand('copy')
+    const result = document.execCommand('copy');
     document.body.removeChild(el);
     if (selected) {
       document.getSelection().removeAllRanges();
@@ -181,9 +185,9 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
     reviewer.classList.remove("error");
 
     show_status("rendering...");
-    hpccWasm.Graphviz.load().then(function (graphviz) {
+    Graphviz.load().then((graphviz) => {
       let dotContent = editor.getSession().getDocument().getValue();
-      let result = null;
+      let result = null; // Needs to be let as it's reassigned
       const currentFormat = formatEl.value;
       const currentEngine = engineEl.value;
 
@@ -220,7 +224,64 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
     history.pushState({ "content": content, "engine": engineEl.value }, "", updatedUrl.toString())
   }
 
+  // Helper functions for updateOutput
+  function _displaySvgInReviewer(svgElement, reviewerEl, downloadBtn, rawElChecked) {
+    // rawElChecked is passed but not directly used here as this function is for !rawEl.checked
+    const serializer = new XMLSerializer();
+    const source = serializer.serializeToString(svgElement);
+    const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+    downloadBtn.href = url;
+    downloadBtn.download = "graphviz.svg";
+
+    const a = document.createElement("a");
+    a.appendChild(svgElement);
+    reviewerEl.appendChild(a);
+
+    svgPanZoom(svgElement, { // svgPanZoom is global
+      zoomEnabled: true,
+      controlIconsEnabled: true,
+      fit: true,
+      center: true,
+    });
+  }
+
+  function _displayPngInReviewer(svgElementToConvert, reviewerEl, downloadBtn, scale, show_error_fn, svgXmlToImage_fn) {
+    const serializer = new XMLSerializer();
+    const source = serializer.serializeToString(svgElementToConvert);
+    const resultWithPNGHeader = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(source)));
+
+    svgXmlToImage_fn(resultWithPNGHeader, (err, image) => { // Use arrow function for callback
+      if (err) {
+        show_error_fn(err);
+        return;
+      }
+      image.setAttribute("title", "graphviz");
+      downloadBtn.href = image.src;
+      downloadBtn.download = "graphviz.png";
+      const a = document.createElement("a");
+      a.appendChild(image);
+      reviewerEl.appendChild(a);
+    });
+  }
+
+  function _displayTextOutputInReviewer(currentFormat, resultValue, reviewerEl) {
+    const textDiv = document.createElement("div");
+    textDiv.id = "text";
+    let resultText;
+
+    if (currentFormat === "svg") { // This implies raw SVG output
+      const serializer = new XMLSerializer();
+      resultText = serializer.serializeToString(resultValue); // resultValue is an SVGElement
+    } else {
+      // For other text formats (json, xdot, plain, ps), resultValue is already the string
+      resultText = resultValue;
+    }
+    textDiv.appendChild(document.createTextNode(resultText));
+    reviewerEl.appendChild(textDiv);
+  }
+
   function updateOutput(result) {
+    // Enable/disable raw output checkbox
     if (formatEl.value === "svg") {
       document.querySelector("#raw").classList.remove("disabled");
       rawEl.disabled = false;
@@ -229,14 +290,14 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
       rawEl.disabled = true;
     }
 
-    var text = reviewer.querySelector("#text");
-    if (text) {
-      reviewer.removeChild(text);
+    // Clear previous output
+    const existingText = reviewer.querySelector("#text");
+    if (existingText) {
+      reviewer.removeChild(existingText);
     }
-
-    var a = reviewer.querySelector("a");
-    if (a) {
-      reviewer.removeChild(a);
+    const existingA = reviewer.querySelector("a");
+    if (existingA) {
+      reviewer.removeChild(existingA);
     }
 
     if (!result) {
@@ -246,64 +307,30 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
     reviewer.classList.remove("working");
     reviewer.classList.remove("error");
 
-    if (formatEl.value == "svg" && !rawEl.checked) {
-      var serializer = new XMLSerializer();
-      var source = serializer.serializeToString(result);
-      // https://stackoverflow.com/questions/18925210/download-blob-content-using-specified-charset
-      //const blob = new Blob(["\ufeff", svg], {type: 'image/svg+xml;charset=utf-8'});
-      const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
-      downloadBtn.href = url;
-      downloadBtn.download = "graphviz.svg";
-      var a = document.createElement("a");
-      a.appendChild(result);
-      reviewer.appendChild(a);
-      svgPanZoom(result, {
-        zoomEnabled: true,
-        controlIconsEnabled: true,
-        fit: true,
-        center: true,
-      });
-    } else if (formatEl.value == "png") {
-      var serializer = new XMLSerializer();
-      var source = serializer.serializeToString(result);
-      let resultWithPNGHeader = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(source)));
-      svgXmlToImage(resultWithPNGHeader, function (err, image) {
-        if (err) {
-          show_error(err)
-          return
-        }
-        image.setAttribute("title", "graphviz");
-        downloadBtn.href = image.src;
-        downloadBtn.download = "graphviz.png";
-        var a = document.createElement("a");
-        a.appendChild(image);
-        reviewer.appendChild(a);
-      })
+    // Delegate to helper functions
+    if (formatEl.value === "svg" && !rawEl.checked) {
+      _displaySvgInReviewer(result, reviewer, downloadBtn, rawEl.checked);
+    } else if (formatEl.value === "png") {
+      _displayPngInReviewer(result, reviewer, downloadBtn, scale, show_error, svgXmlToImage);
     } else {
-      var text = document.createElement("div");
-      text.id = "text";
-      if (formatEl.value == "svg") { // Raw SVG output
-        let serializer = new XMLSerializer();
-        resultText = serializer.serializeToString(result); // result is an SVGElement for raw SVG
-      } else {
-        // For other text formats (json, xdot, plain, ps), result is { output: "..." }
-        resultText = result.output;
-      }
-      text.appendChild(document.createTextNode(resultText));
-      reviewer.appendChild(text);
+      // For text formats (json, xdot, plain, ps) or raw SVG output.
+      // If format is "svg" (raw), result is an SVGElement.
+      // Otherwise, result is { output: "text" } from renderGraph.
+      let outputValue = (formatEl.value === "svg" && rawEl.checked) ? result : result.output;
+      _displayTextOutputInReviewer(formatEl.value, outputValue, reviewer);
     }
 
-    updateState()
+    updateState();
   }
 
   editor.setTheme("ace/theme/twilight");
   editor.getSession().setMode("ace/mode/dot");
-  editor.getSession().on("change", function () {
+  editor.getSession().on("change", () => {
     clearTimeout(lastHD);
     lastHD = setTimeout(renderGraph, 1500);
   });
 
-  window.onpopstate = function (event) {
+  window.onpopstate = (event) => {
     if (event.state != null && event.state.content != undefined) {
       editor.getSession().setValue(decodeURIComponent(event.state.content));
     }
@@ -316,7 +343,7 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
 
   // Since apparently HTMLCollection does not implement the oh so convenient array functions
   HTMLOptionsCollection.prototype.indexOf = function (name) {
-    for (let i = 0; i < this.length; i++) {
+    for (let i = 0; i < this.length; i++) { // Changed var to let
       if (this[i].value == name) {
         return i;
       }
@@ -329,17 +356,17 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
   const params = new URLSearchParams(location.search.substring(1));
   if (params.has('engine')) {
     const engine = params.get('engine');
-    const index = engineEl.options.indexOf(engine);
+    const index = engineEl.options.indexOf(engine); // engineEl is const
     if (index > -1) { // if index exists
       engineEl.selectedIndex = index;
     } else {
-      show_error({ message: `invalid engine ${engine} selected` });
+      show_error({ message: `invalid engine ${engine} selected` }); // show_error is a function
     }
   }
 
   if (params.has('format')) {
     const format = params.get('format');
-    const index = formatEl.options.indexOf(format);
+    const index = formatEl.options.indexOf(format); // formatEl is const
     if (index > -1) {
       formatEl.selectedIndex = index;
     } else {
@@ -352,27 +379,26 @@ window.addEventListener('resize', resizeSVG); // Call the moved resizeSVG
   }
 
   if (params.has('raw')) {
-    editor.getSession().setValue(params.get('raw'));
-    renderGraph();
+    editor.getSession().setValue(params.get('raw')); // editor is const
+    renderGraph(); // renderGraph is a function
   } else if (params.has('compressed')) {
     const compressed = params.get('compressed');
-    editor.getSession().setValue(LZString.decompressFromEncodedURIComponent(compressed));
+    editor.getSession().setValue(LZString.decompressFromEncodedURIComponent(compressed)); // LZString is global
   } else if (params.has('url')) {
     const url = params.get('url');
-    let ok = false;
+    let ok = false; // ok is reassigned
     fetch(url)
-      .then(res => {
+      .then(res => { // Arrow function
         ok = res.ok;
         return res.text();
       })
-      .then(res => {
+      .then(res => { // Arrow function
         if (!ok) {
           throw { message: res };
         }
-
         editor.getSession().setValue(res);
         renderGraph();
-      }).catch(e => {
+      }).catch(e => { // Arrow function
         show_error(e);
       });
   } else if (location.hash.length > 1) {
