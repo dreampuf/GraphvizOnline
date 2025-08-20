@@ -45,15 +45,35 @@
       position: absolute;
       top: 0;
       bottom: 0;
-      right: 50%;
       left: 0;
       transition: width 0.3s ease;
       width: 50%;
     }
 
     #editor.collapsed {
-      width: 0;
+      width: 0 !important;
       overflow: hidden;
+    }
+
+    #splitter {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 5px;
+      background: #ccc;
+      cursor: col-resize;
+      z-index: 5;
+      transition: left 0.3s ease;
+    }
+
+    #splitter:hover {
+      background: #999;
+    }
+
+    #splitter.dragging {
+      background: #666;
+      transition: none;
     }
 
     #review {
@@ -62,19 +82,19 @@
       top: 50px;
       bottom: 0;
       right: 0;
-      left: 50%;
+      left: calc(50% + 5px);
       overflow: scroll;
       transition: left 0.3s ease;
     }
 
     #review.expanded {
-      left: 0;
+      left: 0 !important;
     }
 
     #options {
       margin: 0;
       position: fixed;
-      left: 50%;
+      left: calc(50% + 5px);
       width: 100%;
       flex: 0 0 auto;
       background: #eee;
@@ -85,7 +105,7 @@
     }
 
     #options.expanded {
-      left: 0;
+      left: 0 !important;
     }
 
     #options label {
@@ -203,6 +223,7 @@
   start [shape=Mdiamond];
   end [shape=Msquare];
 }</pre>
+  <div id="splitter"></div>
   <div id="options">
     <label id="engine">
       Engine:
@@ -268,22 +289,105 @@
     const reviewElement = document.getElementById('review');
     const optionsElement = document.getElementById('options');
     const toggleBtn = document.getElementById('toggle-btn');
+    const splitter = document.getElementById('splitter');
 
     let isCollapsed = false;
+    let isDragging = false;
+    let currentSplitPercentage = 50;
+
+    // Splitter drag functionality
+    splitter.addEventListener('mousedown', (e) => {
+      if (isCollapsed) return;
+      isDragging = true;
+      splitter.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      // Disable transitions during drag
+      editorElement.style.transition = 'none';
+      splitter.style.transition = 'none';
+      reviewElement.style.transition = 'none';
+      optionsElement.style.transition = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      
+      const windowWidth = window.innerWidth;
+      const newLeft = e.clientX;
+      const percentage = (newLeft / windowWidth) * 100;
+      
+      // Limit the splitter to reasonable bounds (10% to 90%)
+      if (percentage >= 10 && percentage <= 90) {
+        currentSplitPercentage = percentage;
+        updatePanelSizes(percentage);
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        splitter.classList.remove('dragging');
+        document.body.style.cursor = '';
+        // Re-enable transitions after drag
+        editorElement.style.transition = '';
+        splitter.style.transition = '';
+        reviewElement.style.transition = '';
+        optionsElement.style.transition = '';
+        setTimeout(resizeSVG, 100);
+      }
+    });
+
+    function updatePanelSizes(percentage) {
+      if (!isCollapsed) {
+        editorElement.style.width = `${percentage}%`;
+        splitter.style.left = `${percentage}%`;
+        reviewElement.style.left = `calc(${percentage}% + 5px)`;
+        optionsElement.style.left = `calc(${percentage}% + 5px)`;
+      }
+    }
 
     toggleBtn.addEventListener('click', () => {
       isCollapsed = !isCollapsed;
 
       if (isCollapsed) {
+        // Enable transitions for smooth collapse
+        editorElement.style.transition = 'width 0.3s ease';
+        splitter.style.transition = 'left 0.3s ease, opacity 0.3s ease';
+        reviewElement.style.transition = 'left 0.3s ease';
+        optionsElement.style.transition = 'left 0.3s ease';
+        
         editorElement.classList.add('collapsed');
         reviewElement.classList.add('expanded');
         optionsElement.classList.add('expanded');
+        splitter.style.opacity = '0';
+        splitter.style.left = '0';
         toggleBtn.innerHTML = '▶';
+        
+        // Hide splitter after animation
+        setTimeout(() => {
+          splitter.style.display = 'none';
+        }, 300);
       } else {
-        editorElement.classList.remove('collapsed');
-        reviewElement.classList.remove('expanded');
-        optionsElement.classList.remove('expanded');
-        toggleBtn.innerHTML = '◀';
+        // Position splitter at left edge initially
+        splitter.style.left = '0';
+        splitter.style.opacity = '0';
+        splitter.style.display = 'block';
+        
+        // Enable transitions for smooth expand
+        editorElement.style.transition = 'width 0.3s ease';
+        splitter.style.transition = 'left 0.3s ease, opacity 0.3s ease';
+        reviewElement.style.transition = 'left 0.3s ease';
+        optionsElement.style.transition = 'left 0.3s ease';
+        
+        setTimeout(() => {
+          editorElement.classList.remove('collapsed');
+          reviewElement.classList.remove('expanded');
+          optionsElement.classList.remove('expanded');
+          toggleBtn.innerHTML = '◀';
+          // Restore the split position
+          updatePanelSizes(currentSplitPercentage);
+          splitter.style.opacity = '1';
+        }, 10);
       }
 
       setTimeout(resizeSVG, 300);
