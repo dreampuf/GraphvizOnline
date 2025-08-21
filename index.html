@@ -33,11 +33,45 @@
 
     #toggle-btn {
       cursor: pointer;
-      padding: 8px;
-      background: #eee;
-      border: 1px solid #ccc;
-      border-right: none;
-      border-radius: 4px 0 0 4px;
+      padding: 10px 6px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(222, 226, 230, 0.7);
+      border-left: none;
+      border-radius: 0 6px 6px 0;
+      color: #495057;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.08);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      width: 20px;
+    }
+
+    #toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 2px 0 6px rgba(0,0,0,0.12);
+      color: #212529;
+    }
+
+    #toggle-btn:active {
+      background: rgba(233, 236, 239, 0.8);
+      box-shadow: 1px 0 3px rgba(0,0,0,0.05);
+    }
+
+    #toggle-btn.collapsed {
+      background: linear-gradient(to right, #ffffff, #f8f9fa);
+      border: 1px solid #dee2e6;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.08);
+      color: #495057;
+    }
+
+    #toggle-btn.collapsed:hover {
+      background: linear-gradient(to right, #f8f9fa, #e9ecef);
+      color: #212529;
     }
 
     #editor {
@@ -45,60 +79,161 @@
       position: absolute;
       top: 0;
       bottom: 0;
-      right: 50%;
       left: 0;
       transition: width 0.3s ease;
       width: 50%;
     }
 
     #editor.collapsed {
-      width: 0;
+      width: 0 !important;
       overflow: hidden;
+    }
+
+    #splitter {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 5px;
+      background: #ccc;
+      cursor: col-resize;
+      z-index: 5;
+      transition: left 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.08);
+    }
+
+    #splitter::before {
+      content: '⋮';
+      color: #555;
+      font-size: 20px;
+      font-weight: bold;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    #splitter:hover {
+      background: #999;
+    }
+
+    #splitter:hover::before {
+      color: #222;
+    }
+
+    #splitter.dragging {
+      background: #666;
+      transition: none;
+    }
+
+    #splitter.dragging::before {
+      color: #fff;
     }
 
     #review {
       margin: 0;
       position: absolute;
-      top: 50px;
+      top: 42px;
       bottom: 0;
       right: 0;
-      left: 50%;
+      left: calc(50% + 5px);
       overflow: scroll;
       transition: left 0.3s ease;
     }
 
     #review.expanded {
-      left: 0;
+      left: 0 !important;
     }
 
     #options {
       margin: 0;
       position: fixed;
-      left: 50%;
+      left: calc(50% + 5px);
       width: 100%;
       flex: 0 0 auto;
-      background: #eee;
-      border-bottom: 1px solid #ccc;
-      padding: 8px;
+      background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+      border-bottom: 1px solid #dee2e6;
+      padding: 8px 12px;
       overflow: hidden;
       transition: left 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      z-index: 10;
     }
 
     #options.expanded {
-      left: 0;
+      left: 0 !important;
     }
 
     #options label {
-      margin-right: 8px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #495057;
+      font-weight: 500;
+    }
+
+    #options select {
+      padding: 4px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      background: white;
+      color: #212529;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+
+    #options select:hover {
+      border-color: #adb5bd;
+    }
+
+    #options select:focus {
+      outline: none;
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    #options input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    #options input[type="button"] {
+      padding: 5px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      background: white;
+      color: #212529;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    #options input[type="button"]:hover {
+      background: #f8f9fa;
+      border-color: #adb5bd;
+    }
+
+    #options input[type="button"]:active {
+      background: #e9ecef;
     }
 
     #options #raw.disabled {
       opacity: 0.5;
+      cursor: not-allowed;
     }
 
-    #shareurl {
-      display: none;
+    #options #raw.disabled input {
+      cursor: not-allowed;
     }
+
 
     #status {
       width: 100%;
@@ -159,15 +294,44 @@
     }
 
     #download {
-      font: bold 12px Arial;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
       text-decoration: none;
-      background-color: #EEEEEE;
-      color: #333333;
-      padding: 2px 6px 2px 6px;
-      border-top: 1px solid #CCCCCC;
-      border-right: 1px solid #333333;
-      border-bottom: 1px solid #333333;
-      border-left: 1px solid #CCCCCC;
+      background: white;
+      color: #212529;
+      padding: 5px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      display: inline-block;
+      transition: all 0.15s ease;
+    }
+
+    #download:hover {
+      background: #f8f9fa;
+      border-color: #adb5bd;
+    }
+
+    #download:active {
+      background: #e9ecef;
+    }
+
+    #shareurl {
+      display: none;
+      padding: 4px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      background: white;
+      color: #212529;
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      width: 300px;
+    }
+
+    #shareurl:focus {
+      outline: none;
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
     }
   </style>
 </head>
@@ -203,6 +367,7 @@
   start [shape=Mdiamond];
   end [shape=Msquare];
 }</pre>
+  <div id="splitter"></div>
   <div id="options">
     <label id="engine">
       Engine:
@@ -268,22 +433,107 @@
     const reviewElement = document.getElementById('review');
     const optionsElement = document.getElementById('options');
     const toggleBtn = document.getElementById('toggle-btn');
+    const splitter = document.getElementById('splitter');
 
     let isCollapsed = false;
+    let isDragging = false;
+    let currentSplitPercentage = 50;
+
+    // Splitter drag functionality
+    splitter.addEventListener('mousedown', (e) => {
+      if (isCollapsed) return;
+      isDragging = true;
+      splitter.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      // Disable transitions during drag
+      editorElement.style.transition = 'none';
+      splitter.style.transition = 'none';
+      reviewElement.style.transition = 'none';
+      optionsElement.style.transition = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      
+      const windowWidth = window.innerWidth;
+      const newLeft = e.clientX;
+      const percentage = (newLeft / windowWidth) * 100;
+      
+      // Limit the splitter to reasonable bounds (10% to 90%)
+      if (percentage >= 10 && percentage <= 90) {
+        currentSplitPercentage = percentage;
+        updatePanelSizes(percentage);
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        splitter.classList.remove('dragging');
+        document.body.style.cursor = '';
+        // Re-enable transitions after drag
+        editorElement.style.transition = '';
+        splitter.style.transition = '';
+        reviewElement.style.transition = '';
+        optionsElement.style.transition = '';
+        setTimeout(resizeSVG, 100);
+      }
+    });
+
+    function updatePanelSizes(percentage) {
+      if (!isCollapsed) {
+        editorElement.style.width = `${percentage}%`;
+        splitter.style.left = `${percentage}%`;
+        reviewElement.style.left = `calc(${percentage}% + 5px)`;
+        optionsElement.style.left = `calc(${percentage}% + 5px)`;
+      }
+    }
 
     toggleBtn.addEventListener('click', () => {
       isCollapsed = !isCollapsed;
 
       if (isCollapsed) {
+        // Enable transitions for smooth collapse
+        editorElement.style.transition = 'width 0.3s ease';
+        splitter.style.transition = 'left 0.3s ease, opacity 0.3s ease';
+        reviewElement.style.transition = 'left 0.3s ease';
+        optionsElement.style.transition = 'left 0.3s ease';
+        
         editorElement.classList.add('collapsed');
         reviewElement.classList.add('expanded');
         optionsElement.classList.add('expanded');
+        toggleBtn.classList.add('collapsed');
+        splitter.style.opacity = '0';
+        splitter.style.left = '0';
         toggleBtn.innerHTML = '▶';
+        
+        // Hide splitter after animation
+        setTimeout(() => {
+          splitter.style.display = 'none';
+        }, 300);
       } else {
-        editorElement.classList.remove('collapsed');
-        reviewElement.classList.remove('expanded');
-        optionsElement.classList.remove('expanded');
-        toggleBtn.innerHTML = '◀';
+        // Position splitter at left edge initially
+        splitter.style.left = '0';
+        splitter.style.opacity = '0';
+        splitter.style.display = 'flex';  // Use flex instead of block to keep dots centered
+        
+        // Enable transitions for smooth expand
+        editorElement.style.transition = 'width 0.3s ease';
+        splitter.style.transition = 'left 0.3s ease, opacity 0.3s ease';
+        reviewElement.style.transition = 'left 0.3s ease';
+        optionsElement.style.transition = 'left 0.3s ease';
+        
+        setTimeout(() => {
+          editorElement.classList.remove('collapsed');
+          reviewElement.classList.remove('expanded');
+          optionsElement.classList.remove('expanded');
+          toggleBtn.classList.remove('collapsed');
+          toggleBtn.innerHTML = '◀';
+          // Restore the split position
+          updatePanelSizes(currentSplitPercentage);
+          splitter.style.opacity = '1';
+        }, 10);
       }
 
       setTimeout(resizeSVG, 300);
