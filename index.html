@@ -626,7 +626,7 @@
       }
 
       function copyShareURL(e) {
-        let content = decodeURIComponent(editor.getSession().getDocument().getValue());
+        let content = encodeURIComponent(editor.getSession().getDocument().getValue());
         const longUrl = new URL(location.href);
         longUrl.hash = content;
 
