@@ -855,10 +855,7 @@
       if (params.has('raw')) {
         editor.getSession().setValue(params.get('raw'));
         renderGraph();
-      } else if (params.has('compressed')) {
-        const compressed = params.get('compressed');
-        editor.getSession().setValue(LZString.decompressFromEncodedURIComponent(compressed));
-      } else if (params.has('url')) {
+      } else if (params.has('url')) { 
         const url = params.get('url');
         let ok = false;
         fetch(url)
@@ -876,6 +873,9 @@
           }).catch(e => {
             show_error(e);
           });
+      } else if (params.has('compressed')) {
+        const compressed = params.get('compressed');
+        editor.getSession().setValue(LZString.decompressFromEncodedURIComponent(compressed));
       } else if (location.hash.length > 1) {
         editor.getSession().setValue(decodeURIComponent(location.hash.substring(1)));
       } else if (editor.getValue()) { // Init
