@@ -646,7 +646,9 @@
             shareURLEl.style.display = "inline";
             shareURLEl.value = rs.contents;
           }).catch((err) => {
-            const compressedContent = LZString.compressToEncodedURIComponent(content);
+            const rawContent = editor.getSession().getDocument().getValue();
+            const compressedContent = LZString.compressToEncodedURIComponent(rawContent);
+            
             const compressedUrl = new URL(location.href);
             compressedUrl.searchParams.append("compressed", compressedContent);
             compressedUrl.hash = "";
