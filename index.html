@@ -773,12 +773,18 @@
           var a = document.createElement("a");
           a.appendChild(result);
           reviewer.appendChild(a);
-          svgPanZoom(result, {
-            zoomEnabled: true,
-            controlIconsEnabled: true,
-            fit: true,
-            center: true,
-          });
+          
+          Promise.resolve(window.typesetMathInGraphSvg?.(result))
+            .catch(console.error)
+            .finally(() => {
+              svgPanZoom(result, {
+                zoomEnabled: true,
+                controlIconsEnabled: true,
+                fit: true,
+                center: true,
+              });
+            });
+
         } else if (formatEl.value == "png") {
           var serializer = new XMLSerializer();
           var source = serializer.serializeToString(result);
