@@ -11,15 +11,12 @@
       margin: 0 0;
     }
 
-    body.presentation #editor {
+    :root:not(.ready) body,
+    :root.presentation :is(#editor, #editor-toggle, #splitter) {
       display: none;
     }
 
-    body.presentation #options {
-      left: 0;
-    }
-
-    body.presentation #review {
+    :root.presentation :is(#options, #review) {
       left: 0;
     }
 
@@ -850,8 +847,12 @@
         }
       }
 
-      if (params.has("presentation")) {
-        document.body.classList.add("presentation");
+      if (params.has('presentation')) {
+        document.documentElement.classList.add('presentation');
+        for (const option of params.get('presentation').split(',')) {
+          document.documentElement.classList.add(`presentation-${option}`);
+        }
+
       }
 
       if (params.has('raw')) {
@@ -883,6 +884,8 @@
       } else if (editor.getValue()) { // Init
         renderGraph();
       }
+
+      document.documentElement.classList.add('ready');
 
     })(document);
   </script>
