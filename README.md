@@ -22,6 +22,12 @@ If you would like to display just the graph and not the graph input, you can add
 
 Example: `?presentation=editable,hide-options,show-download`
 
+## Deploy to Wasmer Edge
+
+[![Deploy to Wasmer](https://img.shields.io/badge/Deploy%20to-Wasmer-171717?logo=wasmer&logoColor=white)](https://wasmer.io/apps/create?github=dreampuf%2FGraphvizOnline)
+
+GraphvizOnline is plain static files with no build step, so it can be served as-is. Fork this repository and import your fork if you want to customize it: the import serves the repository you choose and does not copy it into your GitHub account. The editor loads `lz-string` from cdnjs, and the Share button calls `api.allorigins.win` and `is.gd` to shorten links.
+
 # How to implement this
 
 - [viz.js](https://github.com/mdaines/viz.js) This repo has compile graphviz(C) to javascript via [emscripten](https://github.com/kripken/emscripten).
